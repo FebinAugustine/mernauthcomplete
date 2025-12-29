@@ -102,7 +102,7 @@ export const getReportsByFollowUpStatus = TryCatch(async (req, res) => {
 
 export const getReportsByUser = TryCatch(async (req, res) => {
     const userId = req.user._id;
-    const reports = await Report.find({ user: userId }).populate("fellowship");
+    const reports = await Report.find({ user: userId }).populate("user").populate("fellowship");
     res.json({
         message: "Reports found",
         reports,

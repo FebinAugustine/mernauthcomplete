@@ -5,7 +5,10 @@ import api from "../apiIntercepter";
 export const getMyProfile = async () => {
     try {
         const res = await api.get("/me");
-        return res.data;
+        // console.log(res.data.user);
+        const user = res.data.user;
+        
+        return user;
 
     } catch (error) {
         throw error.response || error;

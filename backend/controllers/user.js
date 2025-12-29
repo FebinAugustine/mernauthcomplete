@@ -33,7 +33,7 @@ export const registerUser = TryCatch(async (req, res) => {
         code: issue.code,
       }));
 
-      firstErrorMessage = allErrors[0]?.message || "Validation Error";
+      firstErrorMessage = allErrors[ 0 ]?.message || "Validation Error";
     }
     return res.status(400).json({
       message: firstErrorMessage,
@@ -41,7 +41,7 @@ export const registerUser = TryCatch(async (req, res) => {
     });
   }
 
-  const { name, email, password } = validation.data;
+  const { name, email, password, phone, fellowship } = validation.data;
 
   const rateLimitKey = `register-rate-limit:${req.ip}:${email}`;
 
@@ -69,6 +69,8 @@ export const registerUser = TryCatch(async (req, res) => {
     name,
     email,
     password: hashPassword,
+    phone,
+    fellowship,
   });
 
   await redisClient.set(verifyKey, datatoStore, { EX: 300 });
@@ -117,16 +119,31 @@ export const verifyUser = TryCatch(async (req, res) => {
     });
   }
 
-  const newUser = await User.create({
-    name: userData.name,
-    email: userData.email,
-    password: userData.password,
-  });
+  try {
+    const newUser = await User.create({
+      name: userData.name,
+      email: userData.email,
+      password: userData.password,
+      phone: userData.phone,
+      fellowship: userData.fellowship,
+    });
 
-  res.status(201).json({
-    message: "Email verified successfully! your account has been created",
-    user: { _id: newUser._id, name: newUser.name, email: newUser.email },
-  });
+    res.status(201).json({
+      message: "Email verified successfully! your account has been created",
+      user: { _id: newUser._id, name: newUser.name, email: newUser.email },
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      // Duplicate key error
+      const existingUser = await User.findOne({ email: userData.email });
+      res.status(201).json({
+        message: "Email verified successfully! your account has been created",
+        user: { _id: existingUser._id, name: existingUser.name, email: existingUser.email },
+      });
+    } else {
+      throw error;
+    }
+  }
 });
 
 export const loginUser = TryCatch(async (req, res) => {
@@ -147,7 +164,7 @@ export const loginUser = TryCatch(async (req, res) => {
         code: issue.code,
       }));
 
-      firstErrorMessage = allErrors[0]?.message || "Validation Error";
+      firstErrorMessage = allErrors[ 0 ]?.message || "Validation Error";
     }
     return res.status(400).json({
       message: firstErrorMessage,
@@ -328,5 +345,128 @@ export const refreshCSRF = TryCatch(async (req, res) => {
 export const adminController = TryCatch(async (req, res) => {
   res.json({
     message: "Hello admin",
+  });
+});
+
+export const updateUser = TryCatch(async (req, res) => {
+  const userId = req.user._id;
+  const sanitezedBody = sanitize(req.body);
+  const user = await User.findByIdAndUpdate(userId, sanitezedBody, {
+    new: true,
+    runValidators: true,
+  });
+  res.json({
+    message: "User updated successfully",
+    user,
+  });
+});
+
+export const deleteUser = TryCatch(async (req, res) => {
+  const userId = req.user._id;
+  const user = await User.findByIdAndDelete(userId);
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+  res.json({
+    message: "User deleted successfully",
+  });
+});
+
+export const getAllUsers = TryCatch(async (req, res) => {
+  const users = await User.find();
+  res.json({
+    message: "Users found",
+    users,
+  });
+});
+
+export const getUser = TryCatch(async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+  res.json({
+    message: "User found",
+    user,
+  });
+});
+
+export const forgotPassword = TryCatch(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      message: "Email is required",
+    });
+  }
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(400).json({
+      message: "If your email is valid, a password reset link has been sent",
+    });
+  }
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  const resetKey = `reset:${resetToken}`;
+
+  const datatoStore = JSON.stringify({
+    userId: user._id,
+  });
+
+  await redisClient.set(resetKey, datatoStore, { EX: 900 });
+
+  const subject = "Password Reset Request";
+  const resetLink = `https://yourfrontend.com/reset-password/${resetToken}`;
+  const html = `<p>You requested for password reset. Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 15 minutes.</p>`;
+
+  await sendMail({ email, subject, html });
+
+  res.json({
+    message: "If your email is valid, a password reset link has been sent",
+  });
+});
+
+export const resetPassword = TryCatch(async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({
+      message: "Token and new password are required",
+    });
+  }
+  const resetKey = `reset:${token}`;
+
+  const userDataJson = await redisClient.get(resetKey);
+  if (!userDataJson) {
+    return res.status(400).json({
+      message: "Reset link is expired or invalid",
+    });
+  }
+  await redisClient.del(resetKey);
+
+  const userData = JSON.parse(userDataJson);
+
+  const user = await User.findById(userData.userId);
+  if (!user) {
+    return res.status(400).json({
+      message: "User not found",
+    });
+  }
+
+  const hashPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashPassword;
+
+  await user.save();
+
+  res.json({
+    message: "Password reset successfully",
   });
 });

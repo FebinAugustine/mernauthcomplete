@@ -1,31 +1,45 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { server } from "../main";
+
 import { toast } from "react-toastify";
-import axios from "axios";
+
 import TestDashboard from "./TestDashboard";
+import { registerUser } from "../api/user.api";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [fellowship, setFellowship] = useState("");
   const [btnLoading, setBtnLoading] = useState(false);
+
+  const userData = {
+    name,
+    email,
+    password,
+    phone,
+    fellowship,
+  };
 
   const submitHandler = async (e) => {
     setBtnLoading(true);
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${server}/api/v1/register`, {
-        name,
-        email,
-        password,
-      });
-      toast.success(data.message);
+      const { data } = await registerUser(userData);
       setName("");
       setEmail("");
       setPassword("");
+      setPhone("");
+      setFellowship("");
+      toast.success(data?.message || "Registration successful");
     } catch (error) {
-      toast.error(error.response.data.message);
+      const message =
+        error?.response?.data?.message ||
+        error?.data?.message ||
+        error?.message ||
+        "An error occurred";
+      toast.error(message);
     } finally {
       setBtnLoading(false);
     }
@@ -96,6 +110,45 @@ const Register = () => {
               required
             />
           </div>
+          {/* Phone Number Feild */}
+          <div className="relative mb-4">
+            <label htmlFor="phone" className="leading-7 text-sm text-gray-600">
+              Phone Number
+            </label>
+            <input
+              type="number"
+              id="phone"
+              name="phone"
+              className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          </div>
+          {/* select fellowship from drop down  */}
+          <div className="relative mb-4">
+            <label
+              htmlFor="fellowship"
+              className="leading-7 text-sm text-gray-600"
+            >
+              Fellowship
+            </label>
+            <select
+              id="fellowship"
+              name="fellowship"
+              className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              value={fellowship}
+              onChange={(e) => setFellowship(e.target.value)}
+              required
+            >
+              <option value="">Select Fellowship</option>
+              <option value="Thevara">Thevara</option>
+              <option value="Palarivattom">Palarivattom</option>
+              <option value="FortKochi">FortKochi</option>
+              <option value="Thoppumpady">Thoppumpady</option>
+            </select>
+          </div>
+
           <button
             className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg"
             disabled={btnLoading}

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const server = "http://localhost:5000";
+const server = "http://localhost:5000/api/v1";
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
@@ -23,7 +23,7 @@ api.interceptors.request.use(
       const csrfToken = getCookie("csrfToken");
 
       if (csrfToken) {
-        config.headers["x-csrf-token"] = csrfToken;
+        config.headers[ "x-csrf-token" ] = csrfToken;
       }
     }
     return config;
@@ -78,7 +78,7 @@ api.interceptors.response.use(
         isRefreshingCSRFToken = true;
 
         try {
-          await api.post("/api/v1/refresh-csrf");
+          await api.post("/refresh-csrf");
           processCSRFQueue(null);
           return api(originalRequest);
         } catch (error) {
@@ -102,7 +102,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await api.post("/api/v1/refresh");
+        await api.post("/refresh");
         processQueue(null);
         return api(originalRequest);
       } catch (error) {

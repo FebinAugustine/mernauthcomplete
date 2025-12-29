@@ -1,6 +1,7 @@
 import express from "express";
 import {
   adminController,
+  forgotPassword,
   loginUser,
   logutUser,
   myProfile,
@@ -9,6 +10,8 @@ import {
   registerUser,
   verifyOtp,
   verifyUser,
+  resetPassword,
+  getAllUsers,
 } from "../controllers/user.js";
 import { authorizedAdmin, isAuth } from "../middlewares/isAuth.js";
 import { verifyCSRFToken } from "../config/csrfMiddleware.js";
@@ -24,5 +27,9 @@ router.post("/refresh", refreshToken);
 router.post("/logout", isAuth, verifyCSRFToken, logutUser);
 router.post("/refresh-csrf", isAuth, refreshCSRF);
 router.get("/admin", isAuth, authorizedAdmin, adminController);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
+router.post("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
+
 
 export default router;

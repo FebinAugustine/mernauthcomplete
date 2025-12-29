@@ -7,10 +7,10 @@ import sanitize from "mongo-sanitize";
 
 export const createReport = TryCatch(async (req, res) => {
     const sanitezedBody = sanitize(req.body);
-    const report = new Report(sanitezedBody);
-    if (!report.user || !report.fellowship) {
+    const report = new Report({ ...sanitezedBody, user: req.user._id });
+    if (!report.fellowship) {
         return res.status(400).json({
-            message: "User and Fellowship are required",
+            message: "Fellowship is required",
         });
     }
     await report.save();

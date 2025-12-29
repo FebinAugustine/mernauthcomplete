@@ -6,13 +6,12 @@ const schema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
-            unique: true,
         },
         fellowship: {
             type: String,
             required: true,
-            enum: [ "Kochi", "Ernakulam", "Varappuzha", "Pala", "Zion" ],
-            default: "Kochi",
+            enum: [ "Thevara", "FortKochi", "Palarivattom", "Varappuzha", "Pala", "Zion" ],
+            default: "Thevara",
         },
         typeOfReport: {
             type: String,
@@ -102,3 +101,10 @@ const schema = new mongoose.Schema(
 );
 
 export const Report = mongoose.model("Report", schema);
+
+// Drop the unique index on user if it exists (one-time fix)
+Report.collection.dropIndex('user_1').then(() => {
+    console.log('Dropped unique index on user');
+}).catch(err => {
+    console.log('Index not found or already dropped:', err.message);
+});

@@ -8,6 +8,7 @@ import Reports from "../components/reports";
 import Profile from "../components/profile";
 import Dashboard from "../components/dashboard";
 import Settings from "../components/settings";
+import AddReport from "../components/addReport";
 
 const Home = () => {
   const { logoutUser, user } = AppData();
@@ -81,7 +82,7 @@ const Home = () => {
       case "reports":
         return <Reports reports={reports} />;
       case "add-report":
-        return <div className="p-6">Add Report Form Coming Soon...</div>;
+        return <AddReport user={user} />;
       case "profile":
         return <Profile profile={profile} />;
       case "settings":

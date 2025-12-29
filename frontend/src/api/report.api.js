@@ -101,6 +101,7 @@ export const getReportsByFollowUpStatus = async (followUpStatus) => {
 export const getReportsByUser = async () => {
     try {
         const res = await api.get("/report-by-user");
+        console.log(res.data);
         return res.data;
 
     } catch (error) {

@@ -5,6 +5,9 @@ import { getMyProfile } from "../api/user.api";
 import { getReportsByUser } from "../api/report.api";
 import { toast } from "react-toastify";
 import Reports from "../components/reports";
+import Profile from "../components/profile";
+import Dashboard from "../components/dashboard";
+import Settings from "../components/settings";
 
 const Home = () => {
   const { logoutUser, user } = AppData();
@@ -57,7 +60,8 @@ const Home = () => {
 
   const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: "🏠" },
-    { id: "reports", label: "Reports", icon: "📊" },
+    { id: "reports", label: "All Reports", icon: "📊" },
+    { id: "add-report", label: "Add Report", icon: "➕" },
     { id: "profile", label: "Profile", icon: "👤" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
@@ -73,97 +77,15 @@ const Home = () => {
 
     switch (activeTab) {
       case "dashboard":
-        return (
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">
-                Welcome back, {user?.name}!
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-medium text-blue-900">Role</h3>
-                  <p className="text-blue-600">{user?.role}</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-medium text-green-900">Email</h3>
-                  <p className="text-green-600">{user?.email}</p>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-medium text-purple-900">
-                    Reports
-                  </h3>
-                  <p className="text-purple-600">{reports.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <Dashboard user={user} reports={reports} />;
       case "reports":
         return <Reports reports={reports} />;
+      case "add-report":
+        return <div className="p-6">Add Report Form Coming Soon...</div>;
       case "profile":
-        return (
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Profile</h1>
-            <div className="bg-white rounded-lg shadow p-6">
-              {profile && profile.user && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Name
-                    </label>
-                    <p className="mt-1 text-lg text-gray-900">
-                      {profile.user.name}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <p className="mt-1 text-lg text-gray-900">
-                      {profile.user.email}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Role
-                    </label>
-                    <p className="mt-1 text-lg text-gray-900">
-                      {profile.user.role}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Phone
-                    </label>
-                    <p className="mt-1 text-lg text-gray-900">
-                      {profile.user.phone}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Fellowship
-                    </label>
-                    <p className="mt-1 text-lg text-gray-900">
-                      {profile.user.fellowship}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
+        return <Profile profile={profile} />;
       case "settings":
-        return (
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Settings</h1>
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-gray-600">
-                Settings functionality coming soon...
-              </p>
-            </div>
-          </div>
-        );
+        return <Settings />;
       default:
         return null;
     }

@@ -315,7 +315,7 @@ export const refreshToken = TryCatch(async (req, res) => {
   });
 });
 
-export const logutUser = TryCatch(async (req, res) => {
+export const logoutUser = TryCatch(async (req, res) => {
   const userId = req.user._id;
 
   await revokeRefershToken(userId);

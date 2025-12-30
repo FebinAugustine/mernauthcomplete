@@ -7,7 +7,7 @@ export const getMyProfile = async () => {
         const res = await api.get("/me");
         // console.log(res.data.user);
         const user = res.data.user;
-        
+
         return user;
 
     } catch (error) {
@@ -79,6 +79,18 @@ export const verifyOtp = async (otpData) => {
 export const refreshToken = async () => {
     try {
         const res = await api.post("/refresh");
+        return res.data;
+
+    } catch (error) {
+        throw error.response || error;
+
+    }
+};
+
+// Update user
+export const updateUser = async (userData) => {
+    try {
+        const res = await api.put("/update", userData);
         return res.data;
 
     } catch (error) {

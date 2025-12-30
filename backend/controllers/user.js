@@ -355,6 +355,10 @@ export const updateUser = TryCatch(async (req, res) => {
     new: true,
     runValidators: true,
   });
+
+  // Invalidate cached user data
+  await redisClient.del(`user:${userId}`);
+
   res.json({
     message: "User updated successfully",
     user,

@@ -62,16 +62,14 @@ const Dashboard = ({ user, reports }) => {
             onClick={shareReportSummary}
             className="text-green-600 hover:text-green-800 text-xl"
           >
-          <Share2 size={22} color="#048b07" strokeWidth={3} />
+            <Share2 size={22} color="#048b07" strokeWidth={3} />
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-green-50 p-4 rounded-lg flex items-center">
             <span className="text-2xl mr-3">👍</span>
             <div>
-              <h3 className="text-lg font-medium text-green-900">
-                Total Positive
-              </h3>
+              <h3 className="text-lg font-medium text-green-900">Positive</h3>
               <p className="text-green-600 text-xl font-bold">
                 {positiveCount}
               </p>
@@ -80,18 +78,14 @@ const Dashboard = ({ user, reports }) => {
           <div className="bg-red-50 p-4 rounded-lg flex items-center">
             <span className="text-2xl mr-3">👎</span>
             <div>
-              <h3 className="text-lg font-medium text-red-900">
-                Total Negative
-              </h3>
+              <h3 className="text-lg font-medium text-red-900">Negative</h3>
               <p className="text-red-600 text-xl font-bold">{negativeCount}</p>
             </div>
           </div>
           <div className="bg-gray-50 p-4 rounded-lg flex items-center">
             <span className="text-2xl mr-3">😐</span>
             <div>
-              <h3 className="text-lg font-medium text-gray-900">
-                Total Neutral
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900">Neutral</h3>
               <p className="text-gray-600 text-xl font-bold">{neutralCount}</p>
             </div>
           </div>

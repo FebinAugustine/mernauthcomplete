@@ -8,36 +8,31 @@ import Reports from "../components/reports";
 import Profile from "../components/profile";
 import Dashboard from "../components/dashboard";
 import Settings from "../components/settings";
+
 import AddReport from "../components/addReport";
 
 const Home = () => {
-  const { logoutUser, user } = AppData();
+  const { logoutUser, user, setUser } = AppData();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [profile, setProfile] = useState(null);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (activeTab === "profile") {
-      fetchProfile();
+      refreshProfile();
     } else if (activeTab === "reports" || activeTab === "dashboard") {
       fetchReports();
     }
   }, [activeTab]);
 
-  const fetchProfile = async () => {
-    setLoading(true);
+  const refreshProfile = async () => {
     try {
       const data = await getMyProfile();
-
-      setProfile(data);
-      toast.success(`Profile loaded successfully`);
+      setUser(data);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load profile");
-    } finally {
-      setLoading(false);
+      toast.error("Failed to refresh profile");
     }
   };
 
@@ -100,7 +95,7 @@ const Home = () => {
       case "add-report":
         return <AddReport user={user} />;
       case "profile":
-        return <Profile profile={profile} />;
+        return <Profile refreshProfile={refreshProfile} />;
       case "settings":
         return <Settings />;
       default:

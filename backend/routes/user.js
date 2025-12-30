@@ -8,6 +8,7 @@ import {
   refreshCSRF,
   refreshToken,
   registerUser,
+  updateUser,
   verifyOtp,
   verifyUser,
   resetPassword,
@@ -23,6 +24,7 @@ router.post("/verify/:token", verifyUser);
 router.post("/login", loginUser);
 router.post("/verify", verifyOtp);
 router.get("/me", isAuth, myProfile);
+router.put("/update", isAuth, updateUser);
 router.post("/refresh", refreshToken);
 router.post("/logout", isAuth, verifyCSRFToken, logoutUser);
 router.post("/refresh-csrf", isAuth, refreshCSRF);

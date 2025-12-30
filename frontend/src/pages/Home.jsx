@@ -59,6 +59,16 @@ const Home = () => {
     logoutUser(navigate);
   };
 
+  const refreshReports = async () => {
+    try {
+      const data = await getReportsByUser();
+      setReports(data.reports || []);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to refresh reports");
+    }
+  };
+
   const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: "🏠" },
     { id: "reports", label: "All Reports", icon: "📊" },
@@ -80,7 +90,13 @@ const Home = () => {
       case "dashboard":
         return <Dashboard user={user} reports={reports} />;
       case "reports":
-        return <Reports reports={reports} user={user} />;
+        return (
+          <Reports
+            reports={reports}
+            user={user}
+            refreshReports={refreshReports}
+          />
+        );
       case "add-report":
         return <AddReport user={user} />;
       case "profile":

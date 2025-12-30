@@ -21,7 +21,7 @@ const Home = () => {
   useEffect(() => {
     if (activeTab === "profile") {
       fetchProfile();
-    } else if (activeTab === "reports") {
+    } else if (activeTab === "reports" || activeTab === "dashboard") {
       fetchReports();
     }
   }, [activeTab]);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Share2, Eye, Edit } from "lucide-react";
+import { Share2, Eye, Edit, Search } from "lucide-react";
 import { updateReportById } from "../api/report.api";
 import { toast } from "react-toastify";
 
@@ -9,6 +9,8 @@ const Reports = ({ reports, user, refreshReports }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingReport, setEditingReport] = useState(null);
   const [editFormData, setEditFormData] = useState({});
+  const [sortOrder, setSortOrder] = useState("desc"); // 'asc' or 'desc'
+  const [searchTerm, setSearchTerm] = useState("");
   const currentDate = new Date().toLocaleDateString();
 
   const shareReport = (report) => {
@@ -99,6 +101,25 @@ const Reports = ({ reports, user, refreshReports }) => {
     setEditFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const filteredReports = reports.filter((report) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      report.typeOfReport?.toLowerCase().includes(term) ||
+      report.hearerName?.toLowerCase().includes(term) ||
+      report.mobileNumber?.toString().includes(term)
+    );
+  });
+
+  const sortedReports = [...filteredReports].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    if (sortOrder === "asc") {
+      return dateA - dateB;
+    } else {
+      return dateB - dateA;
+    }
+  });
+
   const shareFullReport = (report) => {
     const message = `Full Report Details shared by ${user?.name} from ${
       user?.fellowship
@@ -141,10 +162,40 @@ const Reports = ({ reports, user, refreshReports }) => {
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">My Reports</h1>
+      <div className="mb-4 flex items-center space-x-4">
+        <div className="flex items-center space-x-2 w-full">
+          <label className="text-sm font-medium text-gray-700">Search:</label>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by type, name, or mobile"
+            className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full lg:w-full h-10"
+          />
+          <span className="text-gray-500">
+            <Search size={22} />
+          </span>
+        </div>
+      </div>
+      <div className="mb-4 flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <label className="text-sm font-medium text-gray-700">
+            Sort by Date:
+          </label>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+          >
+            <option value="asc">Newest First</option>
+            <option value="desc">Oldest First</option>
+          </select>
+        </div>
+      </div>
       <div className=" overflow-hidden">
         {reports.length > 0 ? (
           <div className="divide-y divide-gray-700">
-            {reports.map((report) => (
+            {sortedReports.map((report) => (
               <div
                 key={report._id}
                 className="bg-white rounded-lg p-4 hover:bg-gray-50 mb-2"
@@ -186,6 +237,9 @@ const Reports = ({ reports, user, refreshReports }) => {
                   <p className="text-sm text-gray-800">
                     Submitted on:{" "}
                     {new Date(report.createdAt).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm text-gray-800">
+                    Report Date: {new Date(report.date).toLocaleDateString()}
                   </p>
                   {/* Hearer name */}
                   <p className="text-sm text-gray-800">

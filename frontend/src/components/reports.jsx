@@ -1,7 +1,9 @@
-import React from "react";
-import { Share2 } from "lucide-react";
+import React, { useState } from "react";
+import { Share2, Eye } from "lucide-react";
 
 const Reports = ({ reports, user }) => {
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const currentDate = new Date().toLocaleDateString();
 
   const shareReport = (report) => {
@@ -24,6 +26,16 @@ const Reports = ({ reports, user }) => {
     }\nFollow Up Remarks: ${report.followUpRemarks || "N/A"}`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+  };
+
+  const openModal = (report) => {
+    setSelectedReport(report);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedReport(null);
+    setIsModalOpen(false);
   };
   return (
     <div className="p-6">
@@ -93,13 +105,21 @@ const Reports = ({ reports, user }) => {
                       ? new Date(report.nextFollowUpDate).toLocaleDateString()
                       : "N/A"}
                   </p>
-                  {/* Share Button */}
-                  <div className="mt-4 flex justify-end">
+                  {/* Buttons */}
+                  <div className="mt-4 flex justify-end space-x-2">
+                    <button
+                      onClick={() => openModal(report)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-200 text-sm flex items-center"
+                    >
+                      <Eye size={16} className="mr-1" />
+                      View Full Report
+                    </button>
                     <button
                       onClick={() => shareReport(report)}
-                      className="bg-green-200  p-2 rounded-full hover:bg-green-600 transition duration-200 text-sm flex items-center"
+                      className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition duration-200 text-sm flex items-center"
                     >
-                      <Share2 size={22} color="#048b07" strokeWidth={3} />
+                      <Share2 size={16} className="mr-1" />
+                      Share
                     </button>
                   </div>
                 </div>
@@ -110,6 +130,110 @@ const Reports = ({ reports, user }) => {
           <div className="p-6 text-center text-gray-500">No reports found.</div>
         )}
       </div>
+
+      {/* Modal */}
+      {isModalOpen && selectedReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Full Report Details
+              </h2>
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <strong>Fellowship:</strong> {selectedReport.fellowship}
+                </div>
+                <div>
+                  <strong>Type of Report:</strong> {selectedReport.typeOfReport}
+                </div>
+                <div>
+                  <strong>Date:</strong>{" "}
+                  {new Date(selectedReport.date).toLocaleDateString()}
+                </div>
+                <div>
+                  <strong>Hearer Name:</strong> {selectedReport.hearerName}
+                </div>
+                <div>
+                  <strong>Number of Hearers:</strong>{" "}
+                  {selectedReport.noOfHearers}
+                </div>
+                <div>
+                  <strong>Location:</strong> {selectedReport.location}
+                </div>
+                <div>
+                  <strong>Mobile Number:</strong> {selectedReport.mobileNumber}
+                </div>
+                <div>
+                  <strong>Status:</strong> {selectedReport.status}
+                </div>
+                <div>
+                  <strong>Remarks:</strong> {selectedReport.remarks || "N/A"}
+                </div>
+                <div>
+                  <strong>Follow Up Status:</strong>{" "}
+                  {selectedReport.followUpStatus}
+                </div>
+                <div>
+                  <strong>Next Follow Up Date:</strong>{" "}
+                  {selectedReport.nextFollowUpDate
+                    ? new Date(
+                        selectedReport.nextFollowUpDate
+                      ).toLocaleDateString()
+                    : "N/A"}
+                </div>
+                <div>
+                  <strong>Follow Up Remarks:</strong>{" "}
+                  {selectedReport.followUpRemarks || "N/A"}
+                </div>
+                <div>
+                  <strong>Appointment Date:</strong>{" "}
+                  {selectedReport.appointmentDate
+                    ? new Date(
+                        selectedReport.appointmentDate
+                      ).toLocaleDateString()
+                    : "N/A"}
+                </div>
+                <div>
+                  <strong>Appointment Time:</strong>{" "}
+                  {selectedReport.appointmentTime || "N/A"}
+                </div>
+                <div>
+                  <strong>Appointment Location:</strong>{" "}
+                  {selectedReport.appointmentLocation || "N/A"}
+                </div>
+                <div>
+                  <strong>Appointment Status:</strong>{" "}
+                  {selectedReport.appointmentStatus}
+                </div>
+                <div>
+                  <strong>Evangelist Assigned:</strong>{" "}
+                  {selectedReport.evangelistAssigned || "N/A"}
+                </div>
+                <div>
+                  <strong>Appointment Remarks:</strong>{" "}
+                  {selectedReport.appointmentRemarks || "N/A"}
+                </div>
+                <div>
+                  <strong>Created At:</strong>{" "}
+                  {new Date(selectedReport.createdAt).toLocaleString()}
+                </div>
+                <div>
+                  <strong>Updated At:</strong>{" "}
+                  {new Date(selectedReport.updatedAt).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

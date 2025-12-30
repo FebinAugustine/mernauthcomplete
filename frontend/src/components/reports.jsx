@@ -1,6 +1,30 @@
 import React from "react";
+import { Share2 } from "lucide-react";
 
-const Reports = ({ reports }) => {
+const Reports = ({ reports, user }) => {
+  const currentDate = new Date().toLocaleDateString();
+
+  const shareReport = (report) => {
+    const message = `Report Details shared by ${user?.name} from ${
+      user?.fellowship
+    } on ${currentDate}:\n\nFellowship: ${report.fellowship}\nType of Report: ${
+      report.typeOfReport
+    }\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer Name: ${
+      report.hearerName
+    }\nNumber of Hearers: ${report.noOfHearers}\nLocation: ${
+      report.location
+    }\nMobile Number: ${report.mobileNumber}\nStatus: ${
+      report.status
+    }\nRemarks: ${report.remarks || "N/A"}\nFollow Up Status: ${
+      report.followUpStatus
+    }\nNext Follow Up Date: ${
+      report.nextFollowUpDate
+        ? new Date(report.nextFollowUpDate).toLocaleDateString()
+        : "N/A"
+    }\nFollow Up Remarks: ${report.followUpRemarks || "N/A"}`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+  };
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">My Reports</h1>
@@ -69,6 +93,15 @@ const Reports = ({ reports }) => {
                       ? new Date(report.nextFollowUpDate).toLocaleDateString()
                       : "N/A"}
                   </p>
+                  {/* Share Button */}
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => shareReport(report)}
+                      className="bg-green-200  p-2 rounded-full hover:bg-green-600 transition duration-200 text-sm flex items-center"
+                    >
+                      <Share2 size={22} color="#048b07" strokeWidth={3} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

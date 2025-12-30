@@ -80,7 +80,7 @@ const Home = () => {
       case "dashboard":
         return <Dashboard user={user} reports={reports} />;
       case "reports":
-        return <Reports reports={reports} />;
+        return <Reports reports={reports} user={user} />;
       case "add-report":
         return <AddReport user={user} />;
       case "profile":

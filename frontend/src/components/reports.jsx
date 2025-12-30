@@ -37,6 +37,46 @@ const Reports = ({ reports, user }) => {
     setSelectedReport(null);
     setIsModalOpen(false);
   };
+
+  const shareFullReport = (report) => {
+    const message = `Full Report Details shared by ${user?.name} from ${
+      user?.fellowship
+    } on ${currentDate}:\n\nFellowship: ${report.fellowship}\nType of Report: ${
+      report.typeOfReport
+    }\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer Name: ${
+      report.hearerName
+    }\nNumber of Hearers: ${report.noOfHearers}\nLocation: ${
+      report.location
+    }\nMobile Number: ${report.mobileNumber}\nStatus: ${
+      report.status
+    }\nRemarks: ${report.remarks || "N/A"}\nFollow Up Status: ${
+      report.followUpStatus
+    }\nNext Follow Up Date: ${
+      report.nextFollowUpDate
+        ? new Date(report.nextFollowUpDate).toLocaleDateString()
+        : "N/A"
+    }\nFollow Up Remarks: ${
+      report.followUpRemarks || "N/A"
+    }\nAppointment Date: ${
+      report.appointmentDate
+        ? new Date(report.appointmentDate).toLocaleDateString()
+        : "N/A"
+    }\nAppointment Time: ${
+      report.appointmentTime || "N/A"
+    }\nAppointment Location: ${
+      report.appointmentLocation || "N/A"
+    }\nAppointment Status: ${report.appointmentStatus}\nEvangelist Assigned: ${
+      report.evangelistAssigned || "N/A"
+    }\nAppointment Remarks: ${
+      report.appointmentRemarks || "N/A"
+    }\nCreated At: ${new Date(
+      report.createdAt
+    ).toLocaleString()}\nUpdated At: ${new Date(
+      report.updatedAt
+    ).toLocaleString()}`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+  };
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">My Reports</h1>
@@ -139,12 +179,21 @@ const Reports = ({ reports, user }) => {
               <h2 className="text-2xl font-bold text-gray-900">
                 Full Report Details
               </h2>
-              <button
-                onClick={closeModal}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                ×
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => shareFullReport(selectedReport)}
+                  className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition duration-200 text-sm flex items-center"
+                >
+                  <Share2 size={16} className="mr-1" />
+                  Share
+                </button>
+                <button
+                  onClick={closeModal}
+                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
             </div>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

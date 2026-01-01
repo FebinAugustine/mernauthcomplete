@@ -1,9 +1,52 @@
 import React, { useState } from "react";
 import { AppData } from "../context/AppContext";
+import { changePassword } from "../api/user.api";
+import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
 
 const Settings = ({ setActiveTab }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user } = AppData();
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    setLoading(true);
+    try {
+      await changePassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      toast.success("Password changed successfully");
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to change password");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="">
       {/* Classic Navbar */}
@@ -66,9 +109,101 @@ const Settings = ({ setActiveTab }) => {
           </div>
         </div>
       </div>
-      {/* <h1 className="text-3xl font-bold text-gray-900 mb-6">Settings</h1> */}
-      <div className="bg-white rounded-lg shadow p-6 ml-2 mr-2 md:ml-6 md:mr-6">
-        <p className="text-gray-600">Settings functionality coming soon...</p>
+      <div className="p-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          Change Password
+        </h1>
+        <div className="bg-white rounded-lg shadow p-6">
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Current Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showCurrentPassword ? "text" : "password"}
+                  name="currentPassword"
+                  value={passwordForm.currentPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff size={20} className="text-gray-500" />
+                  ) : (
+                    <Eye size={20} className="text-gray-500" />
+                  )}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                New Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  name="newPassword"
+                  value={passwordForm.newPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showNewPassword ? (
+                    <EyeOff size={20} className="text-gray-500" />
+                  ) : (
+                    <Eye size={20} className="text-gray-500" />
+                  )}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm New Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={passwordForm.confirmPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} className="text-gray-500" />
+                  ) : (
+                    <Eye size={20} className="text-gray-500" />
+                  )}
+                </button>
+              </div>
+            </div>
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {loading ? "Changing Password..." : "Change Password"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

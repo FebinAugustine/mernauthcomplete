@@ -9,6 +9,7 @@ import Loding from "./Loding";
 import Register from "./pages/Register";
 import Verify from "./pages/Verify";
 import Dashboard from "./pages/Dashboard";
+import MainRouter from "./pages/MainRouter";
 
 const App = () => {
   const { isAuth, loading } = AppData();
@@ -19,7 +20,7 @@ const App = () => {
       ) : (
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={isAuth ? <Home /> : <Login />} />
+            <Route path="/" element={isAuth ? <MainRouter /> : <Login />} />
 
             <Route path="/login" element={isAuth ? <Home /> : <Login />} />
             <Route

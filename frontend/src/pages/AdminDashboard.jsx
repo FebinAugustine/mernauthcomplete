@@ -11,7 +11,7 @@ import Settings from "../components/settings";
 
 import AddReport from "../components/addReport";
 
-const Home = () => {
+const AdminDashboard = () => {
   const { logoutUser, user, setUser } = AppData();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("home");
@@ -127,7 +127,7 @@ const Home = () => {
             className="mx-auto h-6 w-auto mb-4"
           />
           <h1 className="hidden md:block text-blue-700 text-lg font-bold title-font mb-2 text-center">
-            THE EVAPOD APP
+            THE EVAPOD {user.role.toUpperCase()}
           </h1>
           {/* <h2 className="hidden md:block text-2xl font-bold text-gray-800">
             Dashboard
@@ -168,4 +168,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default AdminDashboard;

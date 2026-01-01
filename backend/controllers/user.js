@@ -474,3 +474,29 @@ export const resetPassword = TryCatch(async (req, res) => {
     message: "Password reset successfully",
   });
 });
+
+export const changePassword = TryCatch(async (req, res) => {
+  const userId = req.user._id;
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(400).json({
+      message: "User not found",
+    });
+  }
+
+  const comparePassword = await bcrypt.compare(currentPassword, user.password);
+  if (!comparePassword) {
+    return res.status(400).json({
+      message: "Invalid current password",
+    });
+  }
+  const hashPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashPassword;
+  await user.save();
+
+  res.json({
+    message: "Password changed successfully",
+  });
+});

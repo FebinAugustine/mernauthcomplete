@@ -158,3 +158,15 @@ export const resetPassword = async (token, passwordData) => {
 
     }
 };
+
+// Change password
+export const changePassword = async (passwordData) => {
+    try {
+        const res = await api.post("/change-password", passwordData);
+        return res.data;
+
+    } catch (error) {
+        throw error.response || error;
+
+    }
+};

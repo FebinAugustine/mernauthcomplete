@@ -109,7 +109,7 @@ const Home = () => {
           />
         );
       case "settings":
-        return <Settings />;
+        return <Settings setActiveTab={setActiveTab} />;
       default:
         return null;
     }

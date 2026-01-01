@@ -13,6 +13,7 @@ import {
   verifyUser,
   resetPassword,
   getAllUsers,
+  changePassword,
 } from "../controllers/user.js";
 import { authorizedAdmin, isAuth } from "../middlewares/isAuth.js";
 import { verifyCSRFToken } from "../config/csrfMiddleware.js";
@@ -31,6 +32,7 @@ router.post("/refresh-csrf", isAuth, refreshCSRF);
 router.get("/admin", isAuth, authorizedAdmin, adminController);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
+router.post("/change-password", isAuth, changePassword);
 router.post("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
 
 

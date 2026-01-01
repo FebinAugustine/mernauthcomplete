@@ -41,8 +41,8 @@ const Settings = ({ setActiveTab }) => {
         confirmPassword: "",
       });
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to change password");
+      console.error(error.data.message);
+      toast.error(error.data.message || "Failed to change password");
     } finally {
       setLoading(false);
     }

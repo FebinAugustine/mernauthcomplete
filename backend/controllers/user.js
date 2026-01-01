@@ -479,6 +479,48 @@ export const changePassword = TryCatch(async (req, res) => {
   const userId = req.user._id;
   const { currentPassword, newPassword } = req.body;
 
+  // Validate input
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({
+      message: "Current password and new password are required",
+    });
+  }
+
+  // Password strength validation can be added here
+  if (newPassword.length < 8) {
+    return res.status(400).json({
+      message: "New password must be at least 8 characters long",
+    });
+  }
+  if (!newPassword.match(/[a-z]/)) {
+    return res.status(400).json({
+      message: "New password must contain at least one lowercase letter",
+    });
+  }
+  if (!newPassword.match(/[A-Z]/)) {
+    return res.status(400).json({
+      message: "New password must contain at least one uppercase letter",
+    });
+  }
+  if (!newPassword.match(/[0-9]/)) {
+    return res.status(400).json({
+      message: "New password must contain at least one number",
+    });
+  }
+  if (!newPassword.match(/[\W_]/)) {
+    return res.status(400).json({
+      message: "New password must contain at least one special character",
+    });
+  }
+  if (newPassword === currentPassword) {
+    return res.status(400).json({
+      message: "New password cannot be the same as the current password",
+    });
+  }
+
+
+
+
   const user = await User.findById(userId);
   if (!user) {
     return res.status(400).json({

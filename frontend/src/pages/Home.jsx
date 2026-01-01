@@ -100,7 +100,7 @@ const Home = () => {
           />
         );
       case "add-report":
-        return <AddReport user={user} />;
+        return <AddReport user={user} setActiveTab={setActiveTab} />;
       case "profile":
         return (
           <Profile

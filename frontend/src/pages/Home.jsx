@@ -96,6 +96,7 @@ const Home = () => {
             reports={reports}
             user={user}
             refreshReports={refreshReports}
+            setActiveTab={setActiveTab}
           />
         );
       case "add-report":

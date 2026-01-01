@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Share2 } from "lucide-react";
 
-const Dashboard = ({ user, reports }) => {
+const Dashboard = ({ user, reports, setActiveTab }) => {
   const positiveCount = reports.filter((r) => r.status === "Positive").length;
   const negativeCount = reports.filter((r) => r.status === "Negative").length;
   const neutralCount = reports.filter((r) => r.status === "Neutral").length;
@@ -41,10 +41,14 @@ const Dashboard = ({ user, reports }) => {
       <div className="bg-white shadow-md p-4 mb-6">
         <div className="flex justify-between items-center">
           <div className="flex flex-col md:flex-row md:items-center space-x-2">
-            <h2 className="md:hidden text-xl font-bold text-blue-900">EVAPOD HOME</h2>
-            <h3 className="md:text-xl font-medium md:font-bold text-blue-900 overflow-hidden">Welcome Back, {user?.name}!</h3>
+            <h2 className="md:hidden text-xl font-bold text-blue-900">
+              EVAPOD HOME
+            </h2>
+            <h3 className="md:text-xl font-medium md:font-bold text-blue-900 overflow-hidden">
+              Welcome Back, {user?.name}!
+            </h3>
           </div>
-          
+
           {/* User Drop down */}
           <div className="relative">
             <button
@@ -71,18 +75,24 @@ const Dashboard = ({ user, reports }) => {
                 isDropdownOpen ? "" : "hidden"
               }`}
             >
-              <a
-                href="#profile"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              <button
+                onClick={() => {
+                  setActiveTab("profile");
+                  setIsDropdownOpen(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Profile
-              </a>
-              <a
-                href="#settings"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("settings");
+                  setIsDropdownOpen(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Settings
-              </a>
+              </button>
             </div>
           </div>
         </div>

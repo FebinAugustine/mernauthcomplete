@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { AppData } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import { getMyProfile } from "../api/user.api";
@@ -18,15 +18,7 @@ const Home = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (activeTab === "profile") {
-      refreshProfile();
-    } else if (activeTab === "reports" || activeTab === "home") {
-      fetchReports();
-    }
-  }, [activeTab]);
-
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     try {
       const data = await getMyProfile();
       setUser(data);
@@ -34,9 +26,9 @@ const Home = () => {
       console.error(error);
       toast.error("Failed to refresh profile");
     }
-  };
+  }, [setUser]);
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getReportsByUser();
@@ -48,7 +40,15 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [setReports, setLoading]);
+
+  useEffect(() => {
+    if (activeTab === "profile") {
+      refreshProfile();
+    } else if (activeTab === "reports" || activeTab === "home") {
+      fetchReports();
+    }
+  }, [activeTab, refreshProfile, fetchReports]);
 
   const handleLogout = () => {
     logoutUser(navigate);
@@ -83,7 +83,13 @@ const Home = () => {
 
     switch (activeTab) {
       case "home":
-        return <Dashboard user={user} reports={reports} />;
+        return (
+          <Dashboard
+            user={user}
+            reports={reports}
+            setActiveTab={setActiveTab}
+          />
+        );
       case "reports":
         return (
           <Reports
@@ -95,7 +101,12 @@ const Home = () => {
       case "add-report":
         return <AddReport user={user} />;
       case "profile":
-        return <Profile refreshProfile={refreshProfile} />;
+        return (
+          <Profile
+            refreshProfile={refreshProfile}
+            setActiveTab={setActiveTab}
+          />
+        );
       case "settings":
         return <Settings />;
       default:

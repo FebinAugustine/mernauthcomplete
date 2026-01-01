@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Share2 } from "lucide-react";
 
 const Dashboard = ({ user, reports }) => {
@@ -21,6 +21,8 @@ const Dashboard = ({ user, reports }) => {
 
   const currentDate = new Date().toLocaleDateString();
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const shareReportSummary = () => {
     const message = `Report Summary by ${user?.name} from ${user?.fellowship} on ${currentDate}:\n\nTotal Positive: ${positiveCount}\nTotal Negative: ${negativeCount}\nTotal Neutral: ${neutralCount}`;
     const encodedMessage = encodeURIComponent(message);
@@ -38,16 +40,17 @@ const Dashboard = ({ user, reports }) => {
       {/* Classic Navbar */}
       <div className="bg-white shadow-md p-4 mb-6">
         <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <h2 className="text-xl font-bold text-blue-900">EVAPOD HOME</h2>
+          <div className="flex flex-col md:flex-row md:items-center space-x-2">
+            <h2 className="md:hidden text-xl font-bold text-blue-900">EVAPOD HOME</h2>
+            <h3 className="md:text-xl font-medium md:font-bold text-blue-900 overflow-hidden">Welcome Back, {user?.name}!</h3>
           </div>
-          <div>
-            <span className="text-gray-600">ID: </span>
-            <span className="font-semibold text-gray-800">{user?.zionId}</span>
-          </div>
+          
           {/* User Drop down */}
           <div className="relative">
-            <button className="flex items-center space-x-2 focus:outline-none">
+            <button
+              className="flex items-center space-x-2 focus:outline-none"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
               {/* down arrow icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +66,11 @@ const Dashboard = ({ user, reports }) => {
               </svg>
             </button>
             {/* Dropdown menu can be implemented here */}
-            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-1 z-20 hidden">
+            <div
+              className={`absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-1 z-20 ${
+                isDropdownOpen ? "" : "hidden"
+              }`}
+            >
               <a
                 href="#profile"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -82,9 +89,9 @@ const Dashboard = ({ user, reports }) => {
       </div>
       {/* <h1 className="text-3xl font-bold text-blue-900 mb-6">Evapod Home</h1> */}
       <div className="bg-white rounded-lg shadow p-6 mb-6 ml-2 mr-2 md:ml-6 md:mr-6">
-        <h2 className="text-xl font-semibold mb-4">
+        {/* <h2 className="text-xl font-semibold mb-4">
           Welcome back, {user?.name}!
-        </h2>
+        </h2> */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-blue-50 p-4 rounded-lg">
             <h3 className="text-lg font-medium text-blue-900">Role</h3>

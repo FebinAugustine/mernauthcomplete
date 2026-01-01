@@ -115,7 +115,7 @@ const Home = () => {
             className="mx-auto h-6 w-auto mb-4"
           />
           <h1 className="hidden md:block text-blue-700 text-lg font-bold title-font mb-2 text-center">
-            THE EVAPOD APP
+            THE EVAPOD HOME
           </h1>
           {/* <h2 className="hidden md:block text-2xl font-bold text-gray-800">
             Dashboard

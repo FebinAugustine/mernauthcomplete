@@ -30,22 +30,30 @@ const Login = () => {
   };
   return (
     <section className="text-gray-600 body-font">
-      <div className="container px-5 py-24 mx-auto flex flex-wrap items-center">
+      <div className="container md:px-4 lg:px-6 py-24 mx-auto flex flex-wrap items-center">
         <div className="lg:w-3/5 md:w-1/2 md:pr-16 lg:pr-0 pr-0">
-          <h1 className="title-font font-medium text-3xl text-gray-900">
-            Slow-carb next level shoindcgoitch ethical authentic, poko scenester
+          <h1 className="title-font font-medium text-3xl text-gray-600 px-4 text-center">
+            The Blessed Slave
           </h1>
-          <p className="leading-relaxed mt-4">
-            Poke slow-carb mixtape knausgaard, typewriter street art gentrify
-            hammock starladder roathse. Craies vegan tousled etsy austin.
+          <p className="leading-relaxed mt-4 px-4 text-center text-gray-400">
+            Blessed is that slave whom his Master will find at work when HE
+            arrives. Luke 12:43 NRSV
           </p>
         </div>
         <form
           onSubmit={submitHandler}
           className="lg:w-2/6 md:w-1/2 bg-gray-100 rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0"
         >
-          <h2 className="text-gray-900 text-lg font-medium title-font mb-5">
-            Sign Up
+          {/* logo */}
+          <img src="./src/assets/evapod_logo.png" alt="EVAPOD LOGO" className="mx-auto h-12 w-auto mb-4" />
+          <h1 className="text-blue-700 text-lg font-bold title-font mb-2 text-center">
+            THE EVAPOD APP
+          </h1>
+          <p className="text-center text-xs mb-4">
+            Add, Delete, Update Your Daily Reports
+          </p>
+          <h2 className="text-gray-600 text-lg font-bold title-font mb-5 text-center">
+            Sign In
           </h2>
           <div className="relative mb-4">
             <label htmlFor="email" className="leading-7 text-sm text-gray-600">
@@ -89,6 +97,12 @@ const Login = () => {
             Dont have an account?
           </Link>
         </form>
+      </div>
+       {/* footer with copyright */}
+      <div className="w-full text-center mt-4">
+        <p className="text-gray-200 text-xs bg-blue-900 py-2 rounded w-full">
+          &copy; 2026 EVAPOD App | CLEEZ. All rights reserved.
+        </p>
       </div>
     </section>
   );

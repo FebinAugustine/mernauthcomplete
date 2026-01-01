@@ -64,6 +64,15 @@ const schema = new mongoose.Schema(
       maxlength: 6,
       minlength: 1,
     },
+    zone: {
+      type: String,
+      default: "",
+    },
+    subZone: {
+      type: String,
+      default: "",
+    },
+
   },
   { timestamps: true }
 );

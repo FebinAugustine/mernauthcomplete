@@ -45,22 +45,35 @@ const Register = () => {
     }
   };
   return (
-    <section className="text-gray-600 body-font">
-      <div className="container px-5 py-24 mx-auto flex flex-wrap items-center">
+    <section className="text-gray-600 body-font ">
+      <div className="container pb-4 pt-8 md:px-4 lg:px-6  mx-auto flex flex-wrap items-center">
         <div className="lg:w-3/5 md:w-1/2 md:pr-16 lg:pr-0 pr-0">
-          <h1 className="title-font font-medium text-3xl text-gray-900">
-            Slow-carb next level shoindcgoitch ethical authentic, poko scenester
+          <h1 className="title-font font-medium text-3xl text-gray-600 px-4 text-center">
+            Whoever has ears, let them hear.
           </h1>
-          <p className="leading-relaxed mt-4">
-            Poke slow-carb mixtape knausgaard, typewriter street art gentrify
-            hammock starladder roathse. Craies vegan tousled etsy austin.
+          <p className="leading-relaxed mt-4 px-4 text-center text-gray-400">
+            “A farmer went out to sow his seed. ..... Still other seed fell on
+            good soil, where it produced a crop—some yielding a hundred times,
+            some sixty, some thirty
           </p>
         </div>
         <form
           onSubmit={submitHandler}
-          className="lg:w-2/6 md:w-1/2 bg-gray-100 rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0"
+          className="lg:w-2/6 md:w-1/2 bg-gray-100 rounded-lg p-6 flex flex-col md:ml-auto w-full mt-10 md:mt-0 "
         >
-          <h2 className="text-gray-900 text-lg font-medium title-font mb-5">
+          {/* logo */}
+          <img
+            src="./src/assets/evapod_logo.png"
+            alt="EVAPOD LOGO"
+            className="mx-auto h-12 w-auto mb-4"
+          />
+          <h1 className="text-blue-700 text-lg font-bold title-font mb-2 text-center">
+            THE EVAPOD APP
+          </h1>
+          <p className="text-center text-xs mb-4">
+            Setup you Account to Get Started.
+          </p>
+          <h2 className="text-gray-600 text-lg font-bold title-font mb-5 text-center">
             Sign Up
           </h2>
           <div className="relative mb-4">
@@ -155,12 +168,17 @@ const Register = () => {
           >
             {btnLoading ? "Submitting..." : "Button"}
           </button>
-          <Link to={"/login"} className="text-xs text-gray-500 mt-3">
-            have an account?
+          <Link to={"/login"} className="text-sm text-gray-500 mt-3">
+            Have an account?
           </Link>
         </form>
       </div>
-      {/* <TestDashboard /> */}
+      {/* footer with copyright */}
+      <div className="w-full text-center mt-4">
+        <p className="text-gray-200 text-xs bg-blue-900 py-2 rounded w-full">
+          &copy; 2026 EVAPOD App | CLEEZ. All rights reserved.
+        </p>
+      </div>
     </section>
   );
 };

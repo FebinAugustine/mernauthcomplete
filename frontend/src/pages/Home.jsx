@@ -14,14 +14,14 @@ import AddReport from "../components/addReport";
 const Home = () => {
   const { logoutUser, user, setUser } = AppData();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("home");
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (activeTab === "profile") {
       refreshProfile();
-    } else if (activeTab === "reports" || activeTab === "dashboard") {
+    } else if (activeTab === "reports" || activeTab === "home") {
       fetchReports();
     }
   }, [activeTab]);
@@ -65,7 +65,7 @@ const Home = () => {
   };
 
   const sidebarItems = [
-    { id: "dashboard", label: "Dashboard", icon: "🏠" },
+    { id: "home", label: "Home", icon: "🏠" },
     { id: "reports", label: "All Reports", icon: "📊" },
     { id: "add-report", label: "Add Report", icon: "➕" },
     { id: "profile", label: "Profile", icon: "👤" },
@@ -82,7 +82,7 @@ const Home = () => {
     }
 
     switch (activeTab) {
-      case "dashboard":
+      case "home":
         return <Dashboard user={user} reports={reports} />;
       case "reports":
         return (
@@ -108,23 +108,34 @@ const Home = () => {
       {/* Sidebar */}
       <div className="w-20 md:w-64 bg-white shadow-lg">
         <div className="p-6">
-          <h2 className="hidden md:block text-2xl font-bold text-gray-800">
+          {/* logo */}
+          <img
+            src="./src/assets/evapod_logo.png"
+            alt="EVAPOD LOGO"
+            className="mx-auto h-6 w-auto mb-4"
+          />
+          <h1 className="hidden md:block text-blue-700 text-lg font-bold title-font mb-2 text-center">
+            THE EVAPOD APP
+          </h1>
+          {/* <h2 className="hidden md:block text-2xl font-bold text-gray-800">
             Dashboard
-          </h2>
+          </h2> */}
         </div>
         <nav className="mt-6">
           {sidebarItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center px-4 md:px-6 py-3 text-left hover:bg-gray-100 ${
+              className={`w-full flex flex-col md:flex-row items-center md:px-6 py-6 text-left hover:bg-gray-100 ${
                 activeTab === item.id
-                  ? "bg-indigo-50 border-r-4 border-indigo-600 text-indigo-600"
-                  : "text-gray-700"
+                  ? "bg-indigo-100 border-r-4 border-indigo-600 text-indigo-800 font-medium"
+                  : "text-gray-500"
               }`}
             >
-              <span className="mr-3">{item.icon}</span>
-              <span className="hidden md:inline">{item.label}</span>
+              <span className="md:mr-3">{item.icon}</span>
+              <span className="text-xs md:text-lg text-center md:inline">
+                {item.label}
+              </span>
             </button>
           ))}
         </nav>
@@ -134,7 +145,7 @@ const Home = () => {
             className="w-full bg-red-600 text-white py-2 px-2 md:px-4 rounded-md hover:bg-red-700 transition duration-200 text-sm md:text-base"
           >
             <span className="hidden md:inline">Logout</span>
-            <span className="md:hidden">🚪</span>
+            <span className="md:hidden">{/* power lucide icon */}⏻</span>
           </button>
         </div>
       </div>

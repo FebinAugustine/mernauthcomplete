@@ -41,11 +41,13 @@ app.use(
 //importing routes
 import userRoutes from "./routes/user.js";
 import reportRoutes from "./routes/report.route.js";
+import adminRoutes from "./routes/admin.route.js";
+
 
 //using routes
 app.use("/api/v1", userRoutes);
 app.use("/api/v1", reportRoutes);
-
+app.use("/api/v1/admin", adminRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

@@ -10,6 +10,7 @@ import Dashboard from "../components/dashboard";
 import Settings from "../components/settings";
 
 import AddReport from "../components/addReport";
+import AddSubzone from "../components/addSubzone";
 
 const AdminDashboard = () => {
   const { logoutUser, user, setUser } = AppData();
@@ -69,6 +70,9 @@ const AdminDashboard = () => {
     { id: "reports", label: "All Reports", icon: "📊" },
     { id: "add-report", label: "Add Report", icon: "➕" },
     { id: "profile", label: "Profile", icon: "👤" },
+
+    { id: "", label: "ADMIN TOOLS", icon: "" },
+    { id: "add-subzone", label: "Add Subzone", icon: "🏘️" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
@@ -101,6 +105,8 @@ const AdminDashboard = () => {
         );
       case "add-report":
         return <AddReport user={user} setActiveTab={setActiveTab} />;
+      case "add-subzone":
+        return <AddSubzone />;
       case "profile":
         return (
           <Profile
@@ -118,8 +124,8 @@ const AdminDashboard = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-20 md:w-64 bg-white shadow-lg">
-        <div className="p-6">
+      <div className="w-20 md:w-64 bg-white shadow-lg flex flex-col">
+        <div className="p-6 flex-shrink-0">
           {/* logo */}
           <img
             src="./src/assets/evapod_logo.png"
@@ -133,7 +139,19 @@ const AdminDashboard = () => {
             Dashboard
           </h2> */}
         </div>
-        <nav className="mt-6">
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+          .sidebar-nav::-webkit-scrollbar {
+            display: none;
+          }
+        `,
+          }}
+        />
+        <nav
+          className="flex-1 overflow-y-auto sidebar-nav"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {sidebarItems.map((item) => (
             <button
               key={item.id}
@@ -151,7 +169,7 @@ const AdminDashboard = () => {
             </button>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-20 md:w-64 p-4 md:p-6">
+        <div className="p-4 md:p-6 flex-shrink-0">
           <button
             onClick={handleLogout}
             className="w-full bg-red-600 text-white py-2 px-2 md:px-4 rounded-md hover:bg-red-700 transition duration-200 text-sm md:text-base"

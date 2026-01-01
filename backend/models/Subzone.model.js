@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { de } from "zod/v4/locales";
 
 const schema = new mongoose.Schema(
     {
@@ -29,12 +30,16 @@ const schema = new mongoose.Schema(
         totalMembers: {
             type: Number,
             required: true,
-            default: 0,
+            default: 1,
             min: 0,
         },
         allMembers: [ {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+        } ],
+        fellowships: [ {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Fellowship",
         } ],
     },
     { timestamps: true }

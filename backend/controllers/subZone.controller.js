@@ -1,13 +1,28 @@
 
-// Sub zone controller
-const SubZone = require('../models/subZone.model');
-
-const TryCatch = require('../middlewares/TryCatch');
-const sanitize = require('mongo-sanitize');
+import { Subzone } from '../models/subZone.model.js';
+import { User } from '../models/User.js';
+import TryCatch from '../middlewares/TryCatch.js';
+import sanitize from 'mongo-sanitize';
 
 export const createSubZone = TryCatch(async (req, res) => {
-    const sanitezedBody = sanitize(req.body);
-    const subZone = new SubZone(sanitezedBody);
+    const sanitizedBody = sanitize(req.body);
+
+    // find the zonalCoordinator and evngCoordinator by zionId
+    const zonalCoordinator = await User.findOne({ zionId: sanitizedBody.zonalCoordinator });
+    const evngCoordinator = await User.findOne({ zionId: sanitizedBody.evngCoordinator });
+    if (!zonalCoordinator || !evngCoordinator) {
+        return res.status(400).json({
+            message: "Zonal Coordinator or Evening Coordinator not found",
+        });
+    }
+
+    // get the mongodb IDs of the zonalCoordinator and evngCoordinator
+    sanitizedBody.zonalCoordinator = zonalCoordinator._id;
+    sanitizedBody.evngCoordinator = evngCoordinator._id;
+
+    // create the SubZone with sanitized data and save to database
+    const subZone = new Subzone(sanitizedBody);
+
     await subZone.save();
     res.status(201).json({
         message: "SubZone created successfully",
@@ -17,7 +32,7 @@ export const createSubZone = TryCatch(async (req, res) => {
 
 export const getSubZone = TryCatch(async (req, res) => {
     const { id } = req.params;
-    const subZone = await SubZone.findById(id);
+    const subZone = await Subzone.findById(id).populate('zonalCoordinator evngCoordinator allMembers fellowships');
     if (!subZone) {
         return res.status(404).json({
             message: "SubZone not found",
@@ -29,13 +44,44 @@ export const getSubZone = TryCatch(async (req, res) => {
     });
 });
 
+export const getAllSubZones = TryCatch(async (req, res) => {
+    const subZones = await Subzone.find().populate('zonalCoordinator evngCoordinator allMembers fellowships');
+    res.json({
+        message: "SubZones found",
+        subZones,
+    });
+});
+
 export const updateSubZone = TryCatch(async (req, res) => {
     const { id } = req.params;
-    const sanitezedBody = sanitize(req.body);
-    const subZone = await SubZone.findByIdAndUpdate(id, sanitezedBody, {
+    const sanitizedBody = sanitize(req.body);
+
+    // If zonalCoordinator is provided, find by zionId and replace with _id
+    if (sanitizedBody.zonalCoordinator) {
+        const zonalCoordinator = await User.findOne({ zionId: sanitizedBody.zonalCoordinator });
+        if (!zonalCoordinator) {
+            return res.status(400).json({
+                message: "Zonal Coordinator not found",
+            });
+        }
+        sanitizedBody.zonalCoordinator = zonalCoordinator._id;
+    }
+
+    // If evngCoordinator is provided, find by zionId and replace with _id
+    if (sanitizedBody.evngCoordinator) {
+        const evngCoordinator = await User.findOne({ zionId: sanitizedBody.evngCoordinator });
+        if (!evngCoordinator) {
+            return res.status(400).json({
+                message: "Evening Coordinator not found",
+            });
+        }
+        sanitizedBody.evngCoordinator = evngCoordinator._id;
+    }
+
+    const subZone = await Subzone.findByIdAndUpdate(id, sanitizedBody, {
         new: true,
         runValidators: true,
-    });
+    }).populate('zonalCoordinator evngCoordinator allMembers fellowships');
     if (!subZone) {
         return res.status(404).json({
             message: "SubZone not found",
@@ -49,7 +95,7 @@ export const updateSubZone = TryCatch(async (req, res) => {
 
 export const deleteSubZone = TryCatch(async (req, res) => {
     const { id } = req.params;
-    const subZone = await SubZone.findByIdAndDelete(id);
+    const subZone = await Subzone.findById(id);
     if (!subZone) {
         return res.status(404).json({
             message: "SubZone not found",
@@ -60,6 +106,7 @@ export const deleteSubZone = TryCatch(async (req, res) => {
             message: "Cannot delete SubZone with members",
         });
     }
+    await Subzone.findByIdAndDelete(id);
     res.json({
         message: "SubZone deleted successfully",
     });

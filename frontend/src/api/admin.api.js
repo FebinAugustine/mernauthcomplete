@@ -113,7 +113,7 @@ export const getDashboardStats = async () => {
 };
 
 // Get Subzones Paginated
-export const getSubzonesPaginated = async (page = 1, limit = 10) => {
+export const getSubzonesPaginated = async (page = 1, limit = 5) => {
     try {
         const res = await api.get(`/admin/subzones-paginated?page=${page}&limit=${limit}`);
         return res.data;
@@ -123,7 +123,7 @@ export const getSubzonesPaginated = async (page = 1, limit = 10) => {
 };
 
 // Get Fellowships Paginated
-export const getFellowshipsPaginated = async (page = 1, limit = 10) => {
+export const getFellowshipsPaginated = async (page = 1, limit = 5) => {
     try {
         const res = await api.get(`/admin/fellowships-paginated?page=${page}&limit=${limit}`);
         return res.data;

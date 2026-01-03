@@ -3,6 +3,7 @@ import { createReport } from "../api/report.api";
 import { toast } from "react-toastify";
 
 const AddReport = ({ user, setActiveTab }) => {
+  console.log("Current User in AddReport:", user);
   const [formData, setFormData] = useState({
     fellowship: "",
     typeOfReport: "",
@@ -158,7 +159,7 @@ const AddReport = ({ user, setActiveTab }) => {
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                 required
               >
-                <option value="">Select Fellowship</option>
+                <option value="">select Your Fellowship</option>
                 <option value="Thevara">Thevara</option>
                 <option value="FortKochi">FortKochi</option>
                 <option value="Palarivattom">Palarivattom</option>

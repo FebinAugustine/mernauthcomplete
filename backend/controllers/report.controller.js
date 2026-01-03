@@ -2,6 +2,7 @@
 // Report Controller
 
 import { Report } from "../models/Report.model.js";
+import { User } from "../models/User.js";
 import TryCatch from "../middlewares/TryCatch.js";
 import sanitize from "mongo-sanitize";
 
@@ -15,8 +16,8 @@ export const createReport = TryCatch(async (req, res) => {
     }
     await report.save();
     // add report to the user's reports array
-    await req.user.reports.push(report._id);
-    await req.user.save();
+    await User.findByIdAndUpdate(req.user._id, { $push: { reports: report._id } });
+    
     res.status(201).json({
         message: "Report created successfully",
         report,

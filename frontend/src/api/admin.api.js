@@ -75,3 +75,16 @@ export const deleteSubzone = async (id) => {
 
     }
 };
+
+// Create Fellowship
+export const createFellowship = async (fellowshipData) => {
+    try {
+        const res = await api.post("/admin/create-fellowship", fellowshipData);
+        console.log(res.data);
+        return res.data;
+
+    } catch (error) {
+        throw error.response || error;
+
+    }
+};

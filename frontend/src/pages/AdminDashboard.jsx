@@ -11,6 +11,7 @@ import Settings from "../components/settings";
 
 import AddReport from "../components/addReport";
 import AddSubzone from "../components/addSubzone";
+import AddFellowship from "../components/addFellowship";
 
 const AdminDashboard = () => {
   const { logoutUser, user, setUser } = AppData();
@@ -73,6 +74,7 @@ const AdminDashboard = () => {
 
     { id: "", label: "ADMIN TOOLS", icon: "" },
     { id: "add-subzone", label: "Add Subzone", icon: "🏘️" },
+    { id: "add-fellowship", label: "Add Fellowship", icon: " 👥" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
@@ -107,6 +109,8 @@ const AdminDashboard = () => {
         return <AddReport user={user} setActiveTab={setActiveTab} />;
       case "add-subzone":
         return <AddSubzone />;
+      case "add-fellowship":
+        return <AddFellowship />;
       case "profile":
         return (
           <Profile
@@ -125,7 +129,7 @@ const AdminDashboard = () => {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-20 md:w-64 bg-white shadow-lg flex flex-col">
-        <div className="p-6 flex-shrink-0">
+        <div className="p-6 shrink-0">
           {/* logo */}
           <img
             src="./src/assets/evapod_logo.png"
@@ -169,7 +173,7 @@ const AdminDashboard = () => {
             </button>
           ))}
         </nav>
-        <div className="p-4 md:p-6 flex-shrink-0">
+        <div className="p-4 md:p-6 shrink-0">
           <button
             onClick={handleLogout}
             className="w-full bg-red-600 text-white py-2 px-2 md:px-4 rounded-md hover:bg-red-700 transition duration-200 text-sm md:text-base"

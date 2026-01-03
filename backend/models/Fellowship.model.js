@@ -29,7 +29,17 @@ const schema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
-            unique: true,
+
+        },
+        evngCoordinator: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+
+        },
+        zonalCoordinator: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+
         },
         totalMembers: {
             type: Number,

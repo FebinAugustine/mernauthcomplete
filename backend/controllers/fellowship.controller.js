@@ -3,12 +3,49 @@
 // Fellowship Controller
 
 import { Fellowship } from "../models/Fellowship.model.js";
+import { User } from "../models/User.js";
 import TryCatch from "../middlewares/TryCatch.js";
 import sanitize from "mongo-sanitize";
 
 export const createFellowship = TryCatch(async (req, res) => {
-    const sanitezedBody = sanitize(req.body);
-    const fellowship = new Fellowship(sanitezedBody);
+    const sanitizedBody = sanitize(req.body);
+
+    // Find coordinator by zionId
+    const coordinatorUser = await User.findOne({ zionId: sanitizedBody.coordinator });
+    if (!coordinatorUser) {
+        return res.status(400).json({
+            message: "Coordinator not found",
+        });
+    }
+    sanitizedBody.coordinator = coordinatorUser._id;
+
+    // Find evngCoordinator if provided
+    if (sanitizedBody.evngCoordinator !== undefined && sanitizedBody.evngCoordinator !== '' && sanitizedBody.evngCoordinator !== '0') {
+        const evngUser = await User.findOne({ zionId: sanitizedBody.evngCoordinator });
+        if (!evngUser) {
+            return res.status(400).json({
+                message: "Evangelism Coordinator not found",
+            });
+        }
+        sanitizedBody.evngCoordinator = evngUser._id;
+    } else {
+        delete sanitizedBody.evngCoordinator;
+    }
+
+    // Find zonalCoordinator if provided
+    if (sanitizedBody.zonalCoordinator !== undefined && sanitizedBody.zonalCoordinator !== '' && sanitizedBody.zonalCoordinator !== '0') {
+        const zonalUser = await User.findOne({ zionId: sanitizedBody.zonalCoordinator });
+        if (!zonalUser) {
+            return res.status(400).json({
+                message: "Zonal Coordinator not found",
+            });
+        }
+        sanitizedBody.zonalCoordinator = zonalUser._id;
+    } else {
+        delete sanitizedBody.zonalCoordinator;
+    }
+
+    const fellowship = new Fellowship(sanitizedBody);
     await fellowship.save();
     res.status(201).json({
         message: "Fellowship created successfully",

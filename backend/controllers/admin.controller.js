@@ -9,9 +9,9 @@ export const getDashboardStats = TryCatch(async (req, res) => {
     const totalFellowships = await Fellowship.countDocuments();
     const totalUsers = await User.countDocuments();
     const totalReports = await Report.countDocuments();
-    const positiveReports = await Report.countDocuments({ sentiment: 'positive' });
-    const negativeReports = await Report.countDocuments({ sentiment: 'negative' });
-    const neutralReports = await Report.countDocuments({ sentiment: 'neutral' });
+    const positiveReports = await Report.countDocuments({ status: 'Positive' });
+    const negativeReports = await Report.countDocuments({ status: 'Negative' });
+    const neutralReports = await Report.countDocuments({ status: 'Neutral' });
 
     res.json({
         totalSubzones,
@@ -62,17 +62,17 @@ export const getFellowshipsPaginated = TryCatch(async (req, res) => {
 export const getUsersWithReportsPaginated = TryCatch(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const users = await User.find()
+    const users = await User.find({ reports: { $ne: [] } })
         .populate('fellowship', 'name')
         .skip((page - 1) * limit)
         .limit(limit);
-    const usersWithCounts = users.map(user => ({
+    const usersWithCounts = await Promise.all(users.map(async user => ({
         _id: user._id,
         name: user.name,
         fellowship: user.fellowship?.name || '',
-        totalReports: user.reports.length,
-    }));
-    const total = await User.countDocuments();
+        totalReports: await Report.countDocuments({ user: user._id }),
+    })));
+    const total = await User.countDocuments({ reports: { $ne: [] } });
     res.json({
         users: usersWithCounts,
         total,

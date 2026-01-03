@@ -102,9 +102,9 @@ const schema = new mongoose.Schema(
 
 export const Report = mongoose.model("Report", schema);
 
-// Drop the unique index on user if it exists (one-time fix)
-Report.collection.dropIndex('user_1').then(() => {
-    console.log('Dropped unique index on user');
-}).catch(err => {
-    console.log('Index not found or already dropped:', err.message);
-});
+// // Drop the unique index on user if it exists (one-time fix)
+// Report.collection.dropIndex('user_1').then(() => {
+//     console.log('Dropped unique index on user');
+// }).catch(err => {
+//     console.log('Index not found or already dropped:', err.message);
+// });

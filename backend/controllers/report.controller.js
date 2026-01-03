@@ -14,6 +14,9 @@ export const createReport = TryCatch(async (req, res) => {
         });
     }
     await report.save();
+    // add report to the user's reports array
+    await req.user.reports.push(report._id);
+    await req.user.save();
     res.status(201).json({
         message: "Report created successfully",
         report,

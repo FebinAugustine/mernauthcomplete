@@ -13,7 +13,14 @@ import {
     deleteFellowship,
     getAllFellowships,
 } from "../controllers/fellowship.controller.js";
-import { createNewUser } from "../controllers/user.js";
+import { createNewUser, getAllUsers, updateUser, deleteUser, getUser } from "../controllers/user.js";
+import {
+    getDashboardStats,
+    getSubzonesPaginated,
+    getFellowshipsPaginated,
+    getUsersWithReportsPaginated,
+    getUsersPaginated,
+} from "../controllers/admin.controller.js";
 import { authorizedAdmin, isAuth } from "../middlewares/isAuth.js";
 
 const router = express.Router();
@@ -34,9 +41,17 @@ router.get("/get-all-fellowships", isAuth, authorizedAdmin, getAllFellowships);
 
 // User routes can be added here similarly
 router.post("/create-new-user", isAuth, authorizedAdmin, createNewUser);
-// router.get("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
-// router.put("/update-user/:id", isAuth, authorizedAdmin, updateUser);
-// router.delete("/delete-user/:id", isAuth, authorizedAdmin, deleteUser);
-// router.get("/get-user/:id", isAuth, authorizedAdmin, getUser);
+router.get("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
+// get user by id, update user, delete user routes can be added here
+router.put("/update-user/:id", isAuth, authorizedAdmin, updateUser);
+router.delete("/delete-user/:id", isAuth, authorizedAdmin, deleteUser);
+router.get("/get-user/:id", isAuth, authorizedAdmin, getUser);
+
+// Dashboard routes
+router.get("/dashboard-stats", isAuth, authorizedAdmin, getDashboardStats);
+router.get("/subzones-paginated", isAuth, authorizedAdmin, getSubzonesPaginated);
+router.get("/fellowships-paginated", isAuth, authorizedAdmin, getFellowshipsPaginated);
+router.get("/users-reports-paginated", isAuth, authorizedAdmin, getUsersWithReportsPaginated);
+router.get("/users-paginated", isAuth, authorizedAdmin, getUsersPaginated);
 
 export default router;

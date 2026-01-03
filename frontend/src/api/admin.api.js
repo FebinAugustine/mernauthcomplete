@@ -101,3 +101,53 @@ export const createNewUser = async (userData) => {
 
     }
 };
+
+// Get Dashboard Stats
+export const getDashboardStats = async () => {
+    try {
+        const res = await api.get("/admin/dashboard-stats");
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get Subzones Paginated
+export const getSubzonesPaginated = async (page = 1, limit = 10) => {
+    try {
+        const res = await api.get(`/admin/subzones-paginated?page=${page}&limit=${limit}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get Fellowships Paginated
+export const getFellowshipsPaginated = async (page = 1, limit = 10) => {
+    try {
+        const res = await api.get(`/admin/fellowships-paginated?page=${page}&limit=${limit}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get Users with Reports Paginated
+export const getUsersWithReportsPaginated = async (page = 1, limit = 10) => {
+    try {
+        const res = await api.get(`/admin/users-reports-paginated?page=${page}&limit=${limit}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get Users Paginated
+export const getUsersPaginated = async (page = 1, limit = 10) => {
+    try {
+        const res = await api.get(`/admin/users-paginated?page=${page}&limit=${limit}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};

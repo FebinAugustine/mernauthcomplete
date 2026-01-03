@@ -13,6 +13,7 @@ import {
     getReportsByUser,
 } from "../controllers/report.controller.js";
 import { isAuth } from "../middlewares/isAuth.js";
+import { getAllFellowships } from "../controllers/fellowship.controller.js";
 
 const router = express.Router();
 
@@ -25,5 +26,6 @@ router.get("/report-by-user", isAuth, getReportsByUser);
 router.get("/:id", isAuth, getReport);
 router.put("/:id", isAuth, updateReport);
 router.delete("/:id", isAuth, deleteReport);
+
 
 export default router;

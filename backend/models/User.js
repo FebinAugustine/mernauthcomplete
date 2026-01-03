@@ -65,6 +65,10 @@ const schema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subzone",
     },
+    reports: [ {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Report",
+    } ],
 
   },
   { timestamps: true }

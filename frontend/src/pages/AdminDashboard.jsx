@@ -164,22 +164,31 @@ const AdminDashboard = () => {
           className="flex-1 overflow-y-auto sidebar-nav"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {sidebarItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex flex-col md:flex-row items-center md:px-6 py-6 text-left hover:bg-gray-100 ${
-                activeTab === item.id
-                  ? "bg-indigo-100 border-r-4 border-indigo-600 text-indigo-800 font-medium"
-                  : "text-gray-500"
-              }`}
-            >
-              <span className="md:mr-3">{item.icon}</span>
-              <span className="text-xs md:text-lg text-center md:inline">
+          {sidebarItems.map((item) =>
+            item.id === "" ? (
+              <h3
+                key={item.id}
+                className="px-6 py-2 text-gray-700 font-semibold text-sm uppercase"
+              >
                 {item.label}
-              </span>
-            </button>
-          ))}
+              </h3>
+            ) : (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex flex-col md:flex-row items-center md:px-6 py-6 text-left hover:bg-gray-100 ${
+                  activeTab === item.id
+                    ? "bg-indigo-100 border-r-4 border-indigo-600 text-indigo-800 font-medium"
+                    : "text-gray-500"
+                }`}
+              >
+                <span className="md:mr-3">{item.icon}</span>
+                <span className="text-xs md:text-lg text-center md:inline">
+                  {item.label}
+                </span>
+              </button>
+            )
+          )}
         </nav>
         <div className="p-4 md:p-6 shrink-0">
           <button

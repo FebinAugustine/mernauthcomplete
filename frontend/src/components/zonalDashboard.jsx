@@ -158,11 +158,11 @@ const ZonalDashboard = () => {
       {/* Lists */}
       <div className="space-y-8">
         {/* Subzones */}
-        <div>
+        <div className="bg-white p-2 md:p-4 rounded-md">
           <h2 className="text-2xl font-bold mb-4">Subzones</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             {subzones.map((subzone) => (
-              <div key={subzone._id} className="bg-white p-4 rounded-lg shadow">
+              <div key={subzone._id} className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between ">
                 <h3 className="text-lg font-semibold">{subzone.name}</h3>
                 <p>
                   Evangelism Coordinator:{" "}
@@ -195,13 +195,13 @@ const ZonalDashboard = () => {
         </div>
 
         {/* Fellowships */}
-        <div>
+        <div className="bg-white p-2 md:p-4 rounded-md">
           <h2 className="text-2xl font-bold mb-4">Fellowships</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             {fellowships.map((fellowship) => (
               <div
                 key={fellowship._id}
-                className="bg-white p-4 rounded-lg shadow"
+                className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between"
               >
                 <h3 className="text-lg font-semibold">{fellowship.name}</h3>
                 <p>Coordinator: {fellowship.coordinator?.name || "N/A"}</p>
@@ -236,11 +236,11 @@ const ZonalDashboard = () => {
         </div>
 
         {/* Reports (Users with Reports) */}
-        <div>
+        <div className="bg-white p-2 md:p-4 rounded-md">
           <h2 className="text-2xl font-bold mb-4">Reports</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             {usersReports.map((user) => (
-              <div key={user._id} className="bg-white p-4 rounded-lg shadow">
+              <div key={user._id} className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between">
                 <h3 className="text-lg font-semibold">{user.name}</h3>
                 <p>Total Reports: {user.totalReports}</p>
               </div>
@@ -270,11 +270,11 @@ const ZonalDashboard = () => {
         </div>
 
         {/* Users */}
-        <div>
+        <div className="bg-white p-2 md:p-4 rounded-md">
           <h2 className="text-2xl font-bold mb-4">Users</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             {users.map((user) => (
-              <div key={user._id} className="bg-white p-4 rounded-lg shadow">
+              <div key={user._id} className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between">
                 <h3 className="text-lg font-semibold">{user.name}</h3>
                 <p>Fellowship: {user.fellowship?.name || "N/A"}</p>
               </div>

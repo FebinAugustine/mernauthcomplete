@@ -12,6 +12,7 @@ import Settings from "../components/settings";
 import AddReport from "../components/addReport";
 import AddSubzone from "../components/addSubzone";
 import AddFellowship from "../components/addFellowship";
+import AddUser from "../components/addUser";
 
 const AdminDashboard = () => {
   const { logoutUser, user, setUser } = AppData();
@@ -75,6 +76,7 @@ const AdminDashboard = () => {
     { id: "", label: "ADMIN TOOLS", icon: "" },
     { id: "add-subzone", label: "Add Subzone", icon: "🏘️" },
     { id: "add-fellowship", label: "Add Fellowship", icon: " 👥" },
+    { id: "add-user", label: "Add User", icon: "👤" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
@@ -111,6 +113,8 @@ const AdminDashboard = () => {
         return <AddSubzone />;
       case "add-fellowship":
         return <AddFellowship />;
+      case "add-user":
+        return <AddUser />;
       case "profile":
         return (
           <Profile

@@ -13,6 +13,7 @@ import {
     deleteFellowship,
     getAllFellowships,
 } from "../controllers/fellowship.controller.js";
+import { createNewUser } from "../controllers/user.js";
 import { authorizedAdmin, isAuth } from "../middlewares/isAuth.js";
 
 const router = express.Router();
@@ -31,5 +32,11 @@ router.put("/update-fellowship/:id", isAuth, authorizedAdmin, updateFellowship);
 router.delete("/delete-fellowship/:id", isAuth, authorizedAdmin, deleteFellowship);
 router.get("/get-all-fellowships", isAuth, authorizedAdmin, getAllFellowships);
 
+// User routes can be added here similarly
+router.post("/create-new-user", isAuth, authorizedAdmin, createNewUser);
+// router.get("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
+// router.put("/update-user/:id", isAuth, authorizedAdmin, updateUser);
+// router.delete("/delete-user/:id", isAuth, authorizedAdmin, deleteUser);
+// router.get("/get-user/:id", isAuth, authorizedAdmin, getUser);
 
 export default router;

@@ -3,6 +3,8 @@ import { redisClient } from "../index.js";
 import TryCatch from "../middlewares/TryCatch.js";
 import sanitize from "mongo-sanitize";
 import { User } from "../models/User.js";
+import { Fellowship } from "../models/Fellowship.model.js";
+import { Subzone } from "../models/subZone.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import sendMail from "../config/sendMail.js";
@@ -65,12 +67,22 @@ export const registerUser = TryCatch(async (req, res) => {
 
   const verifyKey = `verify:${verifyToken}`;
 
+  // Find the fellowship objectID from Fellowship name and store that ID
+  const fellowshipObject = await Fellowship.findOne({ name: fellowship });
+  if (!fellowshipObject) {
+    return res.status(400).json({
+      message: "Fellowship not found",
+    });
+  }
+
+  console.log(fellowshipObject._id);
+
   const datatoStore = JSON.stringify({
     name,
     email,
     password: hashPassword,
     phone,
-    fellowship,
+    fellowship: fellowshipObject._id,
   });
 
   await redisClient.set(verifyKey, datatoStore, { EX: 300 });
@@ -542,3 +554,53 @@ export const changePassword = TryCatch(async (req, res) => {
     message: "Password changed successfully",
   });
 });
+
+// Create a new User
+export const createNewUser = TryCatch(async (req, res) => {
+  const sanitizedBody = sanitize(req.body);
+  const { name, email, password, role, fellowship, phone, address, gender, dob, zionId, subZone } = sanitizedBody;
+
+  // Hash the password
+  const hashPassword = await bcrypt.hash(password, 10);
+
+  // Find fellowship by name
+  const fellowshipDoc = await Fellowship.findOne({ name: fellowship });
+  if (!fellowshipDoc) {
+    return res.status(400).json({
+      message: "Fellowship not found",
+    });
+  }
+
+  // Find subZone by name if provided
+  let subZoneDoc = null;
+  if (subZone) {
+    subZoneDoc = await Subzone.findOne({ name: subZone });
+    if (!subZoneDoc) {
+      return res.status(400).json({
+        message: "SubZone not found",
+      });
+    }
+  }
+
+  // Create the new user
+  const newUser = await User.create({
+    name,
+    email,
+    password: hashPassword,
+    role: role || "user",
+    fellowship: fellowshipDoc._id,
+    phone,
+    address,
+    gender,
+    dob,
+    zionId,
+    subZone: subZoneDoc ? subZoneDoc._id : undefined,
+    isVerified: true,
+  });
+
+  res.status(201).json({
+    message: "User created successfully",
+    user: newUser,
+  });
+});
+

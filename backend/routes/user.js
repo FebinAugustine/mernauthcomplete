@@ -14,6 +14,7 @@ import {
   resetPassword,
   getAllUsers,
   changePassword,
+  createNewUser,
 } from "../controllers/user.js";
 import { authorizedAdmin, isAuth } from "../middlewares/isAuth.js";
 import { verifyCSRFToken } from "../config/csrfMiddleware.js";
@@ -34,6 +35,9 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 router.post("/change-password", isAuth, changePassword);
 router.post("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
+
+// admin routes can be added here
+router.use("/createnew-user", isAuth, authorizedAdmin, createNewUser);
 
 
 export default router;

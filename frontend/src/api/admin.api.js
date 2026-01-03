@@ -88,3 +88,16 @@ export const createFellowship = async (fellowshipData) => {
 
     }
 };
+
+// Create New User
+export const createNewUser = async (userData) => {
+    try {
+        const res = await api.post("/admin/create-new-user", userData);
+
+        return res.data;
+
+    } catch (error) {
+        throw error.response || error;
+
+    }
+};

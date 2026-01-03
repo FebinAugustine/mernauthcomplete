@@ -29,13 +29,10 @@ const schema = new mongoose.Schema(
       default: false,
     },
     fellowship: {
-      type: String,
-      default: "fellowship",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Fellowship",
       required: true,
-      enum: [ "FortKochi", "Thevara", "Palarivattom", "Thoppumpady", "Palluruthi", "Perumpadappu", "Kannamaly", "Kumbalangi", "Kattiparambu" ],
-      length: 20,
-      maxlength: 20,
-      minlength: 4,
+
     },
     phone: {
       type: Number,
@@ -64,13 +61,9 @@ const schema = new mongoose.Schema(
       maxlength: 6,
       minlength: 1,
     },
-    zone: {
-      type: String,
-      default: "",
-    },
     subZone: {
-      type: String,
-      default: "",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subzone",
     },
 
   },

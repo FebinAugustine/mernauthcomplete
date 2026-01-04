@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { createSubzone } from "../api/admin.api";
+import React, { useState, useEffect } from "react";
+import { createSubzone, getAllSubzones } from "../api/admin.api";
 import { toast } from "react-toastify";
 
 const AddSubzone = () => {
@@ -11,6 +11,23 @@ const AddSubzone = () => {
     totalMembers: 1,
   });
   const [loading, setLoading] = useState(false);
+  const [subzones, setSubzones] = useState([]);
+  const [subzonesLoading, setSubzonesLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSubzones = async () => {
+      try {
+        const data = await getAllSubzones();
+        setSubzones(data.subZones || []);
+      } catch (error) {
+        console.error("Failed to fetch subzones", error);
+        toast.error("Failed to load subzones");
+      } finally {
+        setSubzonesLoading(false);
+      }
+    };
+    fetchSubzones();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,6 +50,9 @@ const AddSubzone = () => {
         evngCoordinator: "",
         totalMembers: 1,
       });
+      // Refresh subzones list
+      const data = await getAllSubzones();
+      setSubzones(data.subZones || []);
     } catch (error) {
       console.error(error);
       toast.error("Failed to add subzone");
@@ -135,6 +155,61 @@ const AddSubzone = () => {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Subzones List */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Existing Subzones
+        </h2>
+        {subzonesLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : subzones.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No subzones found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {subzones.map((subzone) => (
+              <div
+                key={subzone._id}
+                className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {subzone.name}
+                  </h3>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {subzone.zone}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-24">Zonal Coord:</span>
+                    <span>{subzone.zonalCoordinator?.name || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-24">Evng Coord:</span>
+                    <span>{subzone.evngCoordinator?.name || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-24">Members:</span>
+                    <span>{subzone.totalMembers || 0}</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="text-xs text-gray-500">
+                    Created: {new Date(subzone.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

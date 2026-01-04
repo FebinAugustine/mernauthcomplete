@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { createSubzone, getAllSubzones } from "../api/admin.api";
+import {
+  createSubzone,
+  getAllSubzones,
+  updateSubzone,
+  deleteSubzone,
+} from "../api/admin.api";
 import { toast } from "react-toastify";
+import { Edit, Trash2 } from "lucide-react";
 
 const AddSubzone = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +19,15 @@ const AddSubzone = () => {
   const [loading, setLoading] = useState(false);
   const [subzones, setSubzones] = useState([]);
   const [subzonesLoading, setSubzonesLoading] = useState(true);
+  const [editingSubzone, setEditingSubzone] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    zone: "Kochi",
+    zonalCoordinator: "",
+    evngCoordinator: "",
+    totalMembers: 1,
+  });
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     const fetchSubzones = async () => {
@@ -59,6 +74,57 @@ const AddSubzone = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (subzone) => {
+    setEditingSubzone(subzone);
+    setEditFormData({
+      name: subzone.name,
+      zone: subzone.zone,
+      zonalCoordinator: subzone.zonalCoordinator?.zionId || "",
+      evngCoordinator: subzone.evngCoordinator?.zionId || "",
+      totalMembers: subzone.totalMembers,
+    });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditLoading(true);
+    try {
+      await updateSubzone(editingSubzone._id, editFormData);
+      toast.success("Subzone updated successfully!");
+      setEditingSubzone(null);
+      // Refresh subzones list
+      const data = await getAllSubzones();
+      setSubzones(data.subZones || []);
+    } catch (error) {
+      console.error(error.data.data);
+      toast.error(error || "Failed to update subzone");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this subzone?"))
+      return;
+    try {
+      await deleteSubzone(id);
+      toast.success("Subzone deleted successfully!");
+      // Refresh subzones list
+      const data = await getAllSubzones();
+      setSubzones(data.subZones || []);
+    } catch (error) {
+      toast.error(error.data.message || "Failed to delete subzone");
+    }
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
@@ -171,19 +237,38 @@ const AddSubzone = () => {
             No subzones found.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-wrap gap-6 justify-center md:justify-start bg-white p-6 rounded-lg shadow-md">
             {subzones.map((subzone) => (
               <div
                 key={subzone._id}
-                className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200"
+                className="bg-white rounded-lg shadow-md border border-gray-400 p-6 hover:shadow-lg transition-shadow duration-200 w-full md:max-w-70"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {subzone.name}
-                  </h3>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {subzone.zone}
-                  </span>
+                <div className="flex flex-col items-start justify-between mb-4">
+                  <div className="flex flex-row items-center justify-between w-full mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">
+                      {subzone.name}
+                    </h3>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {subzone.zone}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleEdit(subzone)}
+                      className="p-1 text-gray-400 hover:text-blue-700 transition-colors"
+                      title="Edit subzone"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(subzone._id)}
+                      className="p-1 text-gray-400 hover:text-red-700 transition-colors"
+                      title="Delete subzone"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
@@ -211,6 +296,109 @@ const AddSubzone = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {editingSubzone && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Edit Subzone
+              </h3>
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Subzone Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={editFormData.name}
+                    onChange={handleEditChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Zone *
+                  </label>
+                  <select
+                    name="zone"
+                    value={editFormData.zone}
+                    onChange={handleEditChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  >
+                    <option value="Kochi">Kochi</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Zonal Coordinator Zion ID *
+                  </label>
+                  <input
+                    type="number"
+                    name="zonalCoordinator"
+                    value={editFormData.zonalCoordinator}
+                    onChange={handleEditChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Evangelism Coordinator Zion ID *
+                  </label>
+                  <input
+                    type="number"
+                    name="evngCoordinator"
+                    value={editFormData.evngCoordinator}
+                    onChange={handleEditChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Total Members *
+                  </label>
+                  <input
+                    type="number"
+                    name="totalMembers"
+                    value={editFormData.totalMembers}
+                    onChange={handleEditChange}
+                    min="0"
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setEditingSubzone(null)}
+                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {editLoading ? "Updating..." : "Update Subzone"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

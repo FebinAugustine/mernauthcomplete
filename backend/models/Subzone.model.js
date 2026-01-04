@@ -29,8 +29,7 @@ const schema = new mongoose.Schema(
         },
         totalMembers: {
             type: Number,
-            required: true,
-            default: 1,
+            default: 0,
             min: 0,
         },
         allMembers: [ {

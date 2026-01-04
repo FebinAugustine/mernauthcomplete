@@ -91,8 +91,7 @@ const AddFellowship = () => {
         setFellowships((prev) => [...prev, result.fellowship]);
       }
     } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Failed to add fellowship");
+      toast.error(error.data?.message || "Failed to add fellowship");
     } finally {
       setLoading(false);
     }

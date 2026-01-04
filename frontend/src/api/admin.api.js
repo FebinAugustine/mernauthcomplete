@@ -132,6 +132,26 @@ export const createNewUser = async (userData) => {
     }
 };
 
+// Update User
+export const updateUser = async (id, userData) => {
+    try {
+        const res = await api.put(`/admin/update-user/${id}`, userData);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Delete User
+export const deleteUser = async (id) => {
+    try {
+        const res = await api.delete(`/admin/delete-user/${id}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
 // Get Dashboard Stats
 export const getDashboardStats = async () => {
     try {

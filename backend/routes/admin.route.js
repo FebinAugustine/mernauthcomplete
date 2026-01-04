@@ -20,6 +20,8 @@ import {
     getFellowshipsPaginated,
     getUsersWithReportsPaginated,
     getUsersPaginated,
+    updateUserAdmin,
+    deleteUserAdmin,
 } from "../controllers/admin.controller.js";
 import { authorizedAdmin, isAuth } from "../middlewares/isAuth.js";
 
@@ -43,8 +45,8 @@ router.get("/get-all-fellowships", isAuth, authorizedAdmin, getAllFellowships);
 router.post("/create-new-user", isAuth, authorizedAdmin, createNewUser);
 router.get("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
 // get user by id, update user, delete user routes can be added here
-router.put("/update-user/:id", isAuth, authorizedAdmin, updateUser);
-router.delete("/delete-user/:id", isAuth, authorizedAdmin, deleteUser);
+router.put("/update-user/:id", isAuth, authorizedAdmin, updateUserAdmin);
+router.delete("/delete-user/:id", isAuth, authorizedAdmin, deleteUserAdmin);
 router.get("/get-user/:id", isAuth, authorizedAdmin, getUser);
 
 // Dashboard routes

@@ -17,15 +17,6 @@ export const createFellowship = TryCatch(async (req, res) => {
             message: "Coordinator not found",
         });
     }
-
-    // Check if coordinator is already assigned to another fellowship
-    const existingFellowship = await Fellowship.findOne({ coordinator: coordinatorUser._id });
-    if (existingFellowship) {
-        return res.status(400).json({
-            message: "Coordinator is already assigned to another fellowship",
-        });
-    }
-
     sanitizedBody.coordinator = coordinatorUser._id;
 
     // Find evngCoordinator if provided
@@ -88,18 +79,6 @@ export const updateFellowship = TryCatch(async (req, res) => {
                 message: "Coordinator not found",
             });
         }
-
-        // Check if coordinator is already assigned to another fellowship (excluding current one)
-        const existingFellowship = await Fellowship.findOne({
-            coordinator: coordinatorUser._id,
-            _id: { $ne: id }
-        });
-        if (existingFellowship) {
-            return res.status(400).json({
-                message: "Coordinator is already assigned to another fellowship",
-            });
-        }
-
         sanitizedBody.coordinator = coordinatorUser._id;
     }
 

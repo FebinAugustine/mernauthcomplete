@@ -1,6 +1,12 @@
-import React, { useState } from "react";
-import { createNewUser } from "../api/admin.api";
+import React, { useState, useEffect } from "react";
+import {
+  createNewUser,
+  getAllUsers,
+  updateUser,
+  deleteUser,
+} from "../api/admin.api";
 import { toast } from "react-toastify";
+import { Edit, Trash2 } from "lucide-react";
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +23,23 @@ const AddUser = () => {
     subZone: "",
   });
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    email: "",
+    role: "user",
+    fellowship: "",
+    phone: "",
+    address: "",
+    gender: "",
+    dob: "",
+    zionId: "",
+    subZone: "",
+  });
+  const [editLoading, setEditLoading] = useState(false);
+  const [search, setSearch] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,7 +55,7 @@ const AddUser = () => {
     try {
       const dataToSend = { ...formData };
       if (!dataToSend.subZone.trim()) delete dataToSend.subZone;
-      await createNewUser(dataToSend);
+      const result = await createNewUser(dataToSend);
       toast.success("User created successfully!");
       setFormData({
         name: "",
@@ -47,6 +70,10 @@ const AddUser = () => {
         zionId: "",
         subZone: "",
       });
+      // Update cache with new user
+      if (result.user) {
+        setUsers((prev) => [...prev, result.user]);
+      }
     } catch (error) {
       console.error(error.data);
       toast.error(error.data.message || "Failed to create user");
@@ -54,6 +81,93 @@ const AddUser = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const data = await getAllUsers();
+        setUsers(data.users || []);
+      } catch (error) {
+        console.error("Failed to fetch users", error);
+        toast.error("Failed to load users");
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  const handleEdit = (user) => {
+    setEditingUser(user);
+    setEditFormData({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      fellowship: user.fellowship?.name || "",
+      phone: user.phone,
+      address: user.address || "",
+      gender: user.gender || "",
+      dob: user.dob ? new Date(user.dob).toISOString().split("T")[0] : "",
+      zionId: user.zionId,
+      subZone: user.subZone?.name || "",
+    });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setEditLoading(true);
+    try {
+      const dataToSend = { ...editFormData };
+      if (!dataToSend.subZone.trim()) delete dataToSend.subZone;
+
+      const result = await updateUser(editingUser._id, dataToSend);
+      toast.success("User updated successfully!");
+      setEditingUser(null);
+      // Update cache with updated user
+      if (result.user) {
+        setUsers((prev) =>
+          prev.map((user) =>
+            user._id === editingUser._id ? result.user : user
+          )
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Failed to update user");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await deleteUser(id);
+      toast.success("User deleted successfully!");
+      // Update cache by removing deleted user
+      setUsers((prev) => prev.filter((user) => user._id !== id));
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete user");
+    }
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const filteredUsers = users.filter((user) => {
+    if (!search) return true;
+    const searchLower = search.toLowerCase();
+    return (
+      user.name.toLowerCase().includes(searchLower) ||
+      user.email.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <div className="p-6">
@@ -243,6 +357,300 @@ const AddUser = () => {
           </div>
         </form>
       </div>
+
+      {/* Users List */}
+      <div className="mt-8 bg-white rounded-lg shadow p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Existing Users
+        </h2>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search users by name or email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        {usersLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        ) : users.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">No users found.</div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No users match your search.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredUsers.map((user) => (
+              <div
+                key={user._id}
+                className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {user.name}
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        user.role === "admin"
+                          ? "bg-red-100 text-red-800"
+                          : user.role === "zonal"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {user.role}
+                    </span>
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      title="Edit user"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user._id)}
+                      className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      title="Delete user"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-20">Email:</span>
+                    <span>{user.email}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-20">Phone:</span>
+                    <span>{user.phone}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-20">Fellowship:</span>
+                    <span>{user.fellowship?.name || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-20">SubZone:</span>
+                    <span>{user.subZone?.name || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-20">Zion ID:</span>
+                    <span>{user.zionId}</span>
+                  </div>
+                  {user.address && (
+                    <div className="flex items-start text-sm text-gray-600">
+                      <span className="font-medium w-20">Address:</span>
+                      <span className="flex-1">{user.address}</span>
+                    </div>
+                  )}
+                  {user.gender && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="font-medium w-20">Gender:</span>
+                      <span>{user.gender}</span>
+                    </div>
+                  )}
+                  {user.dob && (
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="font-medium w-20">DOB:</span>
+                      <span>{new Date(user.dob).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="text-xs text-gray-500">
+                    Created: {new Date(user.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Edit Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Edit User
+              </h3>
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={editFormData.name}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={editFormData.email}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Role *
+                    </label>
+                    <select
+                      name="role"
+                      value={editFormData.role}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      required
+                    >
+                      <option value="user">User</option>
+                      <option value="zonal">Zonal</option>
+                      <option value="admin">Admin</option>
+                      <option value="evngcordinator">
+                        Evangelism Coordinator
+                      </option>
+                      <option value="cordinator">Coordinator</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Fellowship Name
+                    </label>
+                    <input
+                      type="text"
+                      name="fellowship"
+                      value={editFormData.fellowship}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Phone
+                    </label>
+                    <input
+                      type="number"
+                      name="phone"
+                      value={editFormData.phone}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={editFormData.address}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Gender
+                    </label>
+                    <select
+                      name="gender"
+                      value={editFormData.gender}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Date of Birth
+                    </label>
+                    <input
+                      type="date"
+                      name="dob"
+                      value={editFormData.dob}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Zion ID *
+                    </label>
+                    <input
+                      type="number"
+                      name="zionId"
+                      value={editFormData.zionId}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      SubZone Name
+                    </label>
+                    <input
+                      type="text"
+                      name="subZone"
+                      value={editFormData.subZone}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setEditingUser(null)}
+                    className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {editLoading ? "Updating..." : "Update User"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

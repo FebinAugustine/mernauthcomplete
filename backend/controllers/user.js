@@ -391,7 +391,7 @@ export const deleteUser = TryCatch(async (req, res) => {
 });
 
 export const getAllUsers = TryCatch(async (req, res) => {
-  const users = await User.find();
+  const users = await User.find().populate('fellowship', 'name').populate('subZone', 'name');
   res.json({
     message: "Users found",
     users,

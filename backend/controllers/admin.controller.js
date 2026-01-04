@@ -1,4 +1,5 @@
 import TryCatch from "../middlewares/TryCatch.js";
+import sanitize from "mongo-sanitize";
 import { User } from "../models/User.js";
 import { Fellowship } from "../models/Fellowship.model.js";
 import { Subzone } from "../models/subZone.model.js";
@@ -105,5 +106,62 @@ export const getUsersPaginated = TryCatch(async (req, res) => {
         total,
         page,
         pages: Math.ceil(total / limit),
+    });
+});
+
+export const updateUserAdmin = TryCatch(async (req, res) => {
+    const userId = req.params.id;
+    const sanitizedBody = sanitize(req.body);
+    const { fellowship, subZone, ...updateData } = sanitizedBody;
+
+    // Find fellowship by name if provided
+    if (fellowship) {
+        const fellowshipDoc = await Fellowship.findOne({ name: fellowship });
+        if (!fellowshipDoc) {
+            return res.status(400).json({
+                message: "Fellowship not found",
+            });
+        }
+        updateData.fellowship = fellowshipDoc._id;
+    }
+
+    // Find subZone by name if provided
+    if (subZone) {
+        const subZoneDoc = await Subzone.findOne({ name: subZone });
+        if (!subZoneDoc) {
+            return res.status(400).json({
+                message: "SubZone not found",
+            });
+        }
+        updateData.subZone = subZoneDoc._id;
+    }
+
+    const user = await User.findByIdAndUpdate(userId, updateData, {
+        new: true,
+        runValidators: true,
+    }).populate('fellowship', 'name').populate('subZone', 'name');
+
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found",
+        });
+    }
+
+    res.json({
+        message: "User updated successfully",
+        user,
+    });
+});
+
+export const deleteUserAdmin = TryCatch(async (req, res) => {
+    const userId = req.params.id;
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found",
+        });
+    }
+    res.json({
+        message: "User deleted successfully",
     });
 });

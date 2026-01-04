@@ -89,6 +89,36 @@ export const createFellowship = async (fellowshipData) => {
     }
 };
 
+// Get All Fellowships
+export const getAllFellowships = async () => {
+    try {
+        const res = await api.get("/admin/get-all-fellowships");
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Update Fellowship
+export const updateFellowship = async (id, fellowshipData) => {
+    try {
+        const res = await api.put(`/admin/update-fellowship/${id}`, fellowshipData);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Delete Fellowship
+export const deleteFellowship = async (id) => {
+    try {
+        const res = await api.delete(`/admin/delete-fellowship/${id}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
 // Create New User
 export const createNewUser = async (userData) => {
     try {

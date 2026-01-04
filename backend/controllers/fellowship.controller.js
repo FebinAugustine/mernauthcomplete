@@ -17,6 +17,15 @@ export const createFellowship = TryCatch(async (req, res) => {
             message: "Coordinator not found",
         });
     }
+
+    // Check if coordinator is already assigned to another fellowship
+    const existingFellowship = await Fellowship.findOne({ coordinator: coordinatorUser._id });
+    if (existingFellowship) {
+        return res.status(400).json({
+            message: "Coordinator is already assigned to another fellowship",
+        });
+    }
+
     sanitizedBody.coordinator = coordinatorUser._id;
 
     // Find evngCoordinator if provided
@@ -69,11 +78,61 @@ export const getFellowship = TryCatch(async (req, res) => {
 
 export const updateFellowship = TryCatch(async (req, res) => {
     const { id } = req.params;
-    const sanitezedBody = sanitize(req.body);
-    const fellowship = await Fellowship.findByIdAndUpdate(id, sanitezedBody, {
+    const sanitizedBody = sanitize(req.body);
+
+    // Find coordinator by zionId if provided
+    if (sanitizedBody.coordinator) {
+        const coordinatorUser = await User.findOne({ zionId: sanitizedBody.coordinator });
+        if (!coordinatorUser) {
+            return res.status(400).json({
+                message: "Coordinator not found",
+            });
+        }
+
+        // Check if coordinator is already assigned to another fellowship (excluding current one)
+        const existingFellowship = await Fellowship.findOne({
+            coordinator: coordinatorUser._id,
+            _id: { $ne: id }
+        });
+        if (existingFellowship) {
+            return res.status(400).json({
+                message: "Coordinator is already assigned to another fellowship",
+            });
+        }
+
+        sanitizedBody.coordinator = coordinatorUser._id;
+    }
+
+    // Find evngCoordinator if provided
+    if (sanitizedBody.evngCoordinator !== undefined && sanitizedBody.evngCoordinator !== '' && sanitizedBody.evngCoordinator !== '0') {
+        const evngUser = await User.findOne({ zionId: sanitizedBody.evngCoordinator });
+        if (!evngUser) {
+            return res.status(400).json({
+                message: "Evangelism Coordinator not found",
+            });
+        }
+        sanitizedBody.evngCoordinator = evngUser._id;
+    } else if (sanitizedBody.evngCoordinator === '' || sanitizedBody.evngCoordinator === '0') {
+        sanitizedBody.evngCoordinator = undefined;
+    }
+
+    // Find zonalCoordinator if provided
+    if (sanitizedBody.zonalCoordinator !== undefined && sanitizedBody.zonalCoordinator !== '' && sanitizedBody.zonalCoordinator !== '0') {
+        const zonalUser = await User.findOne({ zionId: sanitizedBody.zonalCoordinator });
+        if (!zonalUser) {
+            return res.status(400).json({
+                message: "Zonal Coordinator not found",
+            });
+        }
+        sanitizedBody.zonalCoordinator = zonalUser._id;
+    } else if (sanitizedBody.zonalCoordinator === '' || sanitizedBody.zonalCoordinator === '0') {
+        sanitizedBody.zonalCoordinator = undefined;
+    }
+
+    const fellowship = await Fellowship.findByIdAndUpdate(id, sanitizedBody, {
         new: true,
         runValidators: true,
-    });
+    }).populate('coordinator evngCoordinator zonalCoordinator');
     if (!fellowship) {
         return res.status(404).json({
             message: "Fellowship not found",
@@ -105,7 +164,7 @@ export const deleteFellowship = TryCatch(async (req, res) => {
 });
 
 export const getAllFellowships = TryCatch(async (req, res) => {
-    const fellowships = await Fellowship.find();
+    const fellowships = await Fellowship.find().populate('coordinator evngCoordinator zonalCoordinator');
     res.json({
         message: "Fellowships found",
         fellowships,

@@ -56,7 +56,7 @@ const AddSubzone = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await createSubzone(formData);
+      const result = await createSubzone(formData);
       toast.success("Subzone added successfully!");
       setFormData({
         name: "",
@@ -65,9 +65,10 @@ const AddSubzone = () => {
         evngCoordinator: "",
         totalMembers: 1,
       });
-      // Refresh subzones list
-      const data = await getAllSubzones();
-      setSubzones(data.subZones || []);
+      // Update cache with new subzone
+      if (result.subZone) {
+        setSubzones((prev) => [...prev, result.subZone]);
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to add subzone");
@@ -91,15 +92,20 @@ const AddSubzone = () => {
     e.preventDefault();
     setEditLoading(true);
     try {
-      await updateSubzone(editingSubzone._id, editFormData);
+      const result = await updateSubzone(editingSubzone._id, editFormData);
       toast.success("Subzone updated successfully!");
       setEditingSubzone(null);
-      // Refresh subzones list
-      const data = await getAllSubzones();
-      setSubzones(data.subZones || []);
+      // Update cache with updated subzone
+      if (result.subZone) {
+        setSubzones((prev) =>
+          prev.map((subzone) =>
+            subzone._id === editingSubzone._id ? result.subZone : subzone
+          )
+        );
+      }
     } catch (error) {
-      console.error(error.data.data);
-      toast.error(error || "Failed to update subzone");
+      console.error(error);
+      toast.error("Failed to update subzone");
     } finally {
       setEditLoading(false);
     }
@@ -111,11 +117,11 @@ const AddSubzone = () => {
     try {
       await deleteSubzone(id);
       toast.success("Subzone deleted successfully!");
-      // Refresh subzones list
-      const data = await getAllSubzones();
-      setSubzones(data.subZones || []);
+      // Update cache by removing deleted subzone
+      setSubzones((prev) => prev.filter((subzone) => subzone._id !== id));
     } catch (error) {
-      toast.error(error.data.message || "Failed to delete subzone");
+      console.error(error);
+      toast.error("Failed to delete subzone");
     }
   };
 

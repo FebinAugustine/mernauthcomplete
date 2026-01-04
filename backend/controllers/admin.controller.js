@@ -84,11 +84,22 @@ export const getUsersWithReportsPaginated = TryCatch(async (req, res) => {
 export const getUsersPaginated = TryCatch(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const users = await User.find()
+    const search = req.query.search || '';
+
+    const query = search
+        ? {
+            $or: [
+                { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ]
+        }
+        : {};
+
+    const users = await User.find(query)
         .populate('fellowship', 'name')
         .skip((page - 1) * limit)
         .limit(limit);
-    const total = await User.countDocuments();
+    const total = await User.countDocuments(query);
     res.json({
         users,
         total,

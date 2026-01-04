@@ -143,9 +143,11 @@ export const getUsersWithReportsPaginated = async (page = 1, limit = 10) => {
 };
 
 // Get Users Paginated
-export const getUsersPaginated = async (page = 1, limit = 10) => {
+export const getUsersPaginated = async (page = 1, limit = 5, search = '') => {
     try {
-        const res = await api.get(`/admin/users-paginated?page=${page}&limit=${limit}`);
+        const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
+        if (search) params.append('search', search);
+        const res = await api.get(`/admin/users-paginated?${params.toString()}`);
         return res.data;
     } catch (error) {
         throw error.response || error;

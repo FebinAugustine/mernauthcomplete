@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   getDashboardStats,
   getSubzonesPaginated,
@@ -17,6 +17,10 @@ const ZonalDashboard = () => {
   const [fellowships, setFellowships] = useState([]);
   const [usersReports, setUsersReports] = useState([]);
   const [users, setUsers] = useState([]);
+
+  // Search state
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   // Pagination states
   const [subzonesPage, setSubzonesPage] = useState(1);
@@ -49,7 +53,17 @@ const ZonalDashboard = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [usersPage]);
+  }, [usersPage, debouncedSearch]);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setUsersPage(1); // Reset to first page on search
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchStats = async () => {
     try {
@@ -93,15 +107,15 @@ const ZonalDashboard = () => {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
-      const data = await getUsersPaginated(usersPage);
+      const data = await getUsersPaginated(usersPage, 5, debouncedSearch);
       setUsers(data.users);
       setTotalPages((prev) => ({ ...prev, users: data.pages }));
     } catch (err) {
       console.error("Failed to load users", err);
     }
-  };
+  }, [usersPage, debouncedSearch]);
 
   if (loading) {
     return (
@@ -162,7 +176,10 @@ const ZonalDashboard = () => {
           <h2 className="text-2xl font-bold mb-4">Subzones</h2>
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             {subzones.map((subzone) => (
-              <div key={subzone._id} className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between ">
+              <div
+                key={subzone._id}
+                className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between "
+              >
                 <h3 className="text-lg font-semibold">{subzone.name}</h3>
                 <p>
                   Evangelism Coordinator:{" "}
@@ -240,7 +257,10 @@ const ZonalDashboard = () => {
           <h2 className="text-2xl font-bold mb-4">Reports</h2>
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             {usersReports.map((user) => (
-              <div key={user._id} className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between">
+              <div
+                key={user._id}
+                className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between"
+              >
                 <h3 className="text-lg font-semibold">{user.name}</h3>
                 <p>Total Reports: {user.totalReports}</p>
               </div>
@@ -272,9 +292,21 @@ const ZonalDashboard = () => {
         {/* Users */}
         <div className="bg-white p-2 md:p-4 rounded-md">
           <h2 className="text-2xl font-bold mb-4">Users</h2>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search users by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
             {users.map((user) => (
-              <div key={user._id} className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between">
+              <div
+                key={user._id}
+                className="bg-white p-4 rounded-lg shadow border border-gray-300 flex flex-col md:flex-row justify-between"
+              >
                 <h3 className="text-lg font-semibold">{user.name}</h3>
                 <p>Fellowship: {user.fellowship?.name || "N/A"}</p>
               </div>

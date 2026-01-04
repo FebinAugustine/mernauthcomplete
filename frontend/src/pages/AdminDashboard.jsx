@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import Reports from "../components/reports";
 import Profile from "../components/profile";
 import Dashboard from "../components/dashboard";
+import AdminHome from "../components/AdminHome";
 import Settings from "../components/settings";
 
 import AddReport from "../components/addReport";

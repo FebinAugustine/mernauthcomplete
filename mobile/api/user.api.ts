@@ -18,6 +18,18 @@ export const updateUser = async (userData: any) => {
   }
 };
 
+export const changePassword = async (passwordData: {
+  currentPassword: string;
+  newPassword: string;
+}) => {
+  try {
+    const res = await api.post("/change-password", passwordData);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const logoutUser = async () => {
   try {
     const res = await api.post("/logout");

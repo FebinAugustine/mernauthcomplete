@@ -10,6 +10,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, router } from "expo-router";
 import { login, LoginData } from "../../api/auth.api";
 import logo from "../../assets/images/evapod_logo.png";
@@ -35,6 +36,7 @@ export default function LoginScreen() {
     try {
       const response = await login(formData);
       Alert.alert("Success", "OTP sent to your email!");
+      await AsyncStorage.setItem("email", formData.email);
       // Navigate to OTP verification
       router.push("./verify-otp");
     } catch (error: any) {

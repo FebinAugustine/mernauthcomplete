@@ -10,37 +10,38 @@ import {
   ScrollView,
   Image,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, router } from "expo-router";
-import { verifyOtp, VerifyOtpData } from "../../api/auth.api";
+import { verifyOtp } from "../../api/auth.api";
 import { storeAuthData } from "../../utils/auth";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const logo = require("../../assets/images/evapod_logo.png");
 
 export default function VerifyOtpScreen() {
-  const [formData, setFormData] = useState<VerifyOtpData>({
-    email: "",
-    otp: "",
-  });
+  const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (field: keyof VerifyOtpData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
   const handleVerifyOtp = async () => {
-    if (!formData.email || !formData.otp) {
-      Alert.alert("Error", "Please fill in all fields");
+    if (!otp) {
+      Alert.alert("Error", "Please enter the OTP");
       return;
     }
 
-    if (formData.otp.length !== 6) {
+    if (otp.length !== 6) {
       Alert.alert("Error", "OTP must be 6 digits");
+      return;
+    }
+
+    const email = await AsyncStorage.getItem("email");
+    if (!email) {
+      Alert.alert("Error", "Email not found. Please login again.");
+      router.replace("./login");
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await verifyOtp(formData);
+      const response = await verifyOtp({ email, otp });
       // Store authentication data
       await storeAuthData(
         {
@@ -49,6 +50,7 @@ export default function VerifyOtpScreen() {
         },
         response.user
       );
+      await AsyncStorage.removeItem("email");
       Alert.alert("Success", `Welcome ${response.user.name}!`);
       router.replace("/");
     } catch (error: any) {
@@ -102,22 +104,6 @@ export default function VerifyOtpScreen() {
 
           {/* Form */}
           <View className="space-y-4">
-            {/* Email Input */}
-            <View>
-              <Text className="text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </Text>
-              <TextInput
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChangeText={(value) => handleInputChange("email", value)}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-              />
-            </View>
-
             {/* OTP Input */}
             <View>
               <Text className="text-sm font-medium text-gray-700 mb-1">
@@ -126,12 +112,9 @@ export default function VerifyOtpScreen() {
               <TextInput
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 text-center text-2xl font-mono tracking-widest"
                 placeholder="000000"
-                value={formData.otp}
+                value={otp}
                 onChangeText={(value) =>
-                  handleInputChange(
-                    "otp",
-                    value.replace(/[^0-9]/g, "").slice(0, 6)
-                  )
+                  setOtp(value.replace(/[^0-9]/g, "").slice(0, 6))
                 }
                 keyboardType="numeric"
                 maxLength={6}
@@ -173,9 +156,8 @@ export default function VerifyOtpScreen() {
           {/* Back to Login Link */}
           <View className="mt-4">
             <Text className="text-gray-600 text-center">
-              Wrong email?{" "}
               <Link href="./login" className="text-blue-600 font-semibold">
-                Go Back
+                Back to Login
               </Link>
             </Text>
           </View>

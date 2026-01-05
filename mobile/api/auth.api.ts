@@ -2,7 +2,7 @@ import axios from "axios";
 import { getAuthData } from "../utils/auth";
 
 const api = axios.create({
-  baseURL: process.env.API_BASE_URL,
+  baseURL: "http://10.160.174.232:5000/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -68,7 +68,7 @@ export const verify = async (data: VerifyData) => {
 
 export const verifyOtp = async (data: VerifyOtpData) => {
   try {
-    const response = await api.post("/verifyOtp", data);
+    const response = await api.post("/verify", data);
     return response.data;
   } catch (error) {
     throw error;

@@ -23,13 +23,18 @@ export default function App() {
   React.useEffect(() => {
     if (!isLoading) {
       if (isAuth) {
-        // User is authenticated, show main app
+        // User is authenticated, redirect based on role
+        if (user?.role === "user") {
+          router.replace("/home");
+        } else {
+          router.replace("/admin");
+        }
       } else {
         // User not authenticated, redirect to login
         router.replace("/login");
       }
     }
-  }, [isLoading, isAuth]);
+  }, [isLoading, isAuth, user]);
 
   if (isLoading) {
     return (

@@ -1,18 +1,21 @@
 import axios from "axios";
 import { getAuthData } from "../utils/auth";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: "http://10.160.174.232:5000/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Add request interceptor to include CSRF token
+// Add request interceptor to include CSRF token and Authorization
 api.interceptors.request.use(async (config) => {
   const authData = await getAuthData();
   if (authData?.csrfToken) {
     config.headers["x-csrf-token"] = authData.csrfToken;
+  }
+  if (authData?.accessToken) {
+    config.headers["Authorization"] = `Bearer ${authData.accessToken}`;
   }
   return config;
 });

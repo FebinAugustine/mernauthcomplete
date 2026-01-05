@@ -274,6 +274,7 @@ export const verifyOtp = TryCatch(async (req, res) => {
       sessionId: tokenData.sessionId,
       loginTime: new Date().toISOString(),
       csrfToken: tokenData.csrfToken,
+      accessToken: tokenData.accessToken,
     },
   });
 });

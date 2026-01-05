@@ -10,6 +10,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, router } from "expo-router";
 import { verifyOtp } from "../../api/auth.api";
@@ -45,6 +46,7 @@ export default function VerifyOtpScreen() {
       // Store authentication data
       await storeAuthData(
         {
+          accessToken: response.sessionInfo.accessToken,
           csrfToken: response.sessionInfo.csrfToken,
           sessionId: response.sessionInfo.sessionId,
         },
@@ -52,7 +54,11 @@ export default function VerifyOtpScreen() {
       );
       await AsyncStorage.removeItem("email");
       Alert.alert("Success", `Welcome ${response.user.name}!`);
-      router.replace("/");
+      if (response.user.role === "user") {
+        router.replace("/home");
+      } else {
+        router.replace("/admin");
+      }
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
@@ -64,105 +70,109 @@ export default function VerifyOtpScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
-    >
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-          paddingBottom: 20,
-        }}
-        keyboardShouldPersistTaps="handled"
-        contentInsetAdjustmentBehavior="automatic"
+    <SafeAreaView className="flex-1">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
       >
-        <View className="flex-1 justify-center px-6 py-12">
-          {/* Logo */}
-          <Image
-            source={logo}
-            className="mx-auto h-12 mb-4"
-            resizeMode="contain"
-          />
-          <Text className="text-blue-700 text-lg font-bold text-center mb-2">
-            THE EVAPOD APP
-          </Text>
-          <Text className="text-center text-xs mb-4 text-gray-500">
-            Verify your Account.
-          </Text>
-
-          {/* Header */}
-          <View className="mb-8">
-            <Text className="text-3xl font-bold text-gray-900 text-center mb-2">
-              Verify OTP
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingBottom: 20,
+          }}
+          keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="automatic"
+        >
+          <View className="flex-1 justify-center px-6 py-12">
+            {/* Logo */}
+            <Image
+              source={logo}
+              className="mx-auto h-12 mb-4"
+              resizeMode="contain"
+            />
+            <Text className="text-blue-700 text-lg font-bold text-center mb-2">
+              THE EVAPOD APP
             </Text>
-            <Text className="text-gray-600 text-center">
-              Enter the 6-digit code sent to your email
+            <Text className="text-center text-xs mb-4 text-gray-500">
+              Verify your Account.
             </Text>
-          </View>
 
-          {/* Form */}
-          <View className="space-y-4">
-            {/* OTP Input */}
-            <View>
-              <Text className="text-sm font-medium text-gray-700 mb-1">
-                OTP Code
+            {/* Header */}
+            <View className="mb-8">
+              <Text className="text-3xl font-bold text-gray-900 text-center mb-2">
+                Verify OTP
               </Text>
-              <TextInput
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 text-center text-2xl font-mono tracking-widest"
-                placeholder="000000"
-                value={otp}
-                onChangeText={(value) =>
-                  setOtp(value.replace(/[^0-9]/g, "").slice(0, 6))
-                }
-                keyboardType="numeric"
-                maxLength={6}
-                autoComplete="one-time-code"
-              />
+              <Text className="text-gray-600 text-center">
+                Enter the 6-digit code sent to your email
+              </Text>
+            </View>
+
+            {/* Form */}
+            <View className="space-y-4">
+              {/* OTP Input */}
+              <View>
+                <Text className="text-sm font-medium text-gray-700 mb-1">
+                  OTP Code
+                </Text>
+                <TextInput
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 text-center text-2xl font-mono tracking-widest"
+                  placeholder="000000"
+                  value={otp}
+                  onChangeText={(value) =>
+                    setOtp(value.replace(/[^0-9]/g, "").slice(0, 6))
+                  }
+                  keyboardType="numeric"
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                />
+              </View>
+            </View>
+
+            {/* Verify OTP Button */}
+            <TouchableOpacity
+              className={`w-full py-3 rounded-lg mt-6 ${
+                isLoading ? "bg-gray-400" : "bg-blue-600"
+              }`}
+              onPress={handleVerifyOtp}
+              disabled={isLoading}
+            >
+              <Text className="text-white text-center font-semibold text-lg">
+                {isLoading ? "Verifying..." : "Verify OTP"}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Resend OTP Link */}
+            <View className="mt-6">
+              <Text className="text-gray-600 text-center">
+                Didn&apos;t receive the code?{" "}
+                <TouchableOpacity
+                  onPress={() =>
+                    Alert.alert(
+                      "Info",
+                      "Resend functionality would be implemented here"
+                    )
+                  }
+                >
+                  <Text className="text-blue-600 font-semibold">
+                    Resend OTP
+                  </Text>
+                </TouchableOpacity>
+              </Text>
+            </View>
+
+            {/* Back to Login Link */}
+            <View className="mt-4">
+              <Text className="text-gray-600 text-center">
+                <Link href="./login" className="text-blue-600 font-semibold">
+                  Back to Login
+                </Link>
+              </Text>
             </View>
           </View>
-
-          {/* Verify OTP Button */}
-          <TouchableOpacity
-            className={`w-full py-3 rounded-lg mt-6 ${
-              isLoading ? "bg-gray-400" : "bg-blue-600"
-            }`}
-            onPress={handleVerifyOtp}
-            disabled={isLoading}
-          >
-            <Text className="text-white text-center font-semibold text-lg">
-              {isLoading ? "Verifying..." : "Verify OTP"}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Resend OTP Link */}
-          <View className="mt-6">
-            <Text className="text-gray-600 text-center">
-              Didn&apos;t receive the code?{" "}
-              <TouchableOpacity
-                onPress={() =>
-                  Alert.alert(
-                    "Info",
-                    "Resend functionality would be implemented here"
-                  )
-                }
-              >
-                <Text className="text-blue-600 font-semibold">Resend OTP</Text>
-              </TouchableOpacity>
-            </Text>
-          </View>
-
-          {/* Back to Login Link */}
-          <View className="mt-4">
-            <Text className="text-gray-600 text-center">
-              <Link href="./login" className="text-blue-600 font-semibold">
-                Back to Login
-              </Link>
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

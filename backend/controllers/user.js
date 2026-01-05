@@ -280,7 +280,7 @@ export const verifyOtp = TryCatch(async (req, res) => {
 });
 
 export const myProfile = TryCatch(async (req, res) => {
-  const user = req.user;
+  const userId = req.user._id;
 
   const sessionId = req.sessionId;
 
@@ -296,6 +296,9 @@ export const myProfile = TryCatch(async (req, res) => {
       lastActivity: parsedSession.lastActivity,
     };
   }
+
+  // Populate fellowship and subZone
+  const user = await User.findById(userId).select("-password").populate('fellowship', 'name').populate('subZone', 'name');
 
   res.json({ user, sessionInfo });
 });
@@ -364,6 +367,29 @@ export const adminController = TryCatch(async (req, res) => {
 export const updateUser = TryCatch(async (req, res) => {
   const userId = req.user._id;
   const sanitezedBody = sanitize(req.body);
+
+  // Handle fellowship conversion if provided as string
+  if (sanitezedBody.fellowship && typeof sanitezedBody.fellowship === 'string') {
+    const fellowshipObject = await Fellowship.findOne({ name: sanitezedBody.fellowship });
+    if (!fellowshipObject) {
+      return res.status(400).json({
+        message: "Fellowship not found",
+      });
+    }
+    sanitezedBody.fellowship = fellowshipObject._id;
+  }
+
+  // Handle subZone conversion if provided as string
+  if (sanitezedBody.subZone && typeof sanitezedBody.subZone === 'string') {
+    const subZoneObject = await Subzone.findOne({ name: sanitezedBody.subZone });
+    if (!subZoneObject) {
+      return res.status(400).json({
+        message: "SubZone not found",
+      });
+    }
+    sanitezedBody.subZone = subZoneObject._id;
+  }
+
   const user = await User.findByIdAndUpdate(userId, sanitezedBody, {
     new: true,
     runValidators: true,

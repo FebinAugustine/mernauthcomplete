@@ -16,6 +16,16 @@ export interface User {
   name: string;
   email: string;
   role?: string;
+  phone?: number;
+  fellowship?: any; // Can be ObjectId or populated object
+  address?: string;
+  gender?: string;
+  dob?: string;
+  zionId?: number;
+  isVerified?: boolean;
+  isBlocked?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const storeAuthData = async (tokens: AuthTokens, user: User) => {

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const connectDb = async () => {
+  console.log("Attempting to connect to MongoDB...");
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       dbName: "MERNAuthentication",
@@ -8,7 +9,7 @@ const connectDb = async () => {
 
     console.log("MongoDb connected");
   } catch (error) {
-    console.log("Failed to connect");
+    console.log("Failed to connect:", error.message);
   }
 };
 

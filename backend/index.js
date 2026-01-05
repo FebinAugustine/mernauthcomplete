@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [ "http://localhost:5173", "http://localhost:3000" ]; // Add more as needed
+      const allowedOrigins = [ "http://localhost:5173", "http://localhost:3000", "http://10.160.174.232:5000" ]; // Add more as needed
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -57,6 +57,6 @@ app.use("/api/v1", reportRoutes);
 app.use("/api/v1/admin", adminRoutes);
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });

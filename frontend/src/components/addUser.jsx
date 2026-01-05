@@ -165,7 +165,9 @@ const AddUser = () => {
     const searchLower = search.toLowerCase();
     return (
       user.name.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower)
+      user.email.toLowerCase().includes(searchLower) ||
+      user.phone.toString().includes(searchLower) ||
+      user.zionId.toString().includes(searchLower)
     );
   });
 
@@ -366,7 +368,7 @@ const AddUser = () => {
         <div className="mb-4">
           <input
             type="text"
-            placeholder="Search users by name or email..."
+            placeholder="Search users by name, email, phone, or Zion ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"

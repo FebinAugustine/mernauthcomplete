@@ -11,7 +11,7 @@ import {
   Image,
 } from "react-native";
 import { Link, router } from "expo-router";
-import { register, RegisterData } from "../../api/auth.api";
+import { RegisterData } from "../../api/auth.api";
 const logo = require("../../assets/images/evapod_logo.png");
 
 export default function RegisterScreen() {
@@ -54,7 +54,6 @@ export default function RegisterScreen() {
 
     setIsLoading(true);
     try {
-      const response = await register(formData);
       Alert.alert(
         "Success",
         "Registration successful! Please check your email for verification link."
@@ -85,11 +84,11 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
         contentInsetAdjustmentBehavior="automatic"
       >
-        <View className="flex-1 justify-center px-6 py-12">
+        <View className="flex-1 justify-center px-6 py-12 mt-10">
           {/* Logo */}
           <Image
             source={logo}
-            className="mx-auto h-12 w-auto mb-4"
+            className="mx-auto h-12 w-12 mb-4"
             resizeMode="contain"
           />
           <Text className="text-blue-700 text-lg font-bold text-center mb-2">

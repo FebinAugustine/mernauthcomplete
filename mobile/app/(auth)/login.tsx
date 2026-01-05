@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Link, router } from "expo-router";
 import { login, LoginData } from "../../api/auth.api";
-const logo = require("../../assets/images/evapod_logo.png");
+import logo from "../../assets/images/evapod_logo.png";
 
 export default function LoginScreen() {
   const [formData, setFormData] = useState<LoginData>({
@@ -65,7 +65,7 @@ export default function LoginScreen() {
           {/* Logo */}
           <Image
             source={logo}
-            className="mx-auto h-12 w-auto mb-4"
+            className="mx-auto h-12 w-12 mb-4"
             resizeMode="contain"
           />
           <Text className="text-blue-700 text-lg font-bold text-center mb-2">

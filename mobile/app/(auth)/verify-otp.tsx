@@ -13,7 +13,8 @@ import {
 import { Link, router } from "expo-router";
 import { verifyOtp, VerifyOtpData } from "../../api/auth.api";
 import { storeAuthData } from "../../utils/auth";
-import logo from "../../assets/images/evapod_logo.png";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const logo = require("../../assets/images/evapod_logo.png");
 
 export default function VerifyOtpScreen() {
   const [formData, setFormData] = useState<VerifyOtpData>({
@@ -79,7 +80,7 @@ export default function VerifyOtpScreen() {
           {/* Logo */}
           <Image
             source={logo}
-            className="mx-auto h-12 w-auto mb-4"
+            className="mx-auto h-12 mb-4"
             resizeMode="contain"
           />
           <Text className="text-blue-700 text-lg font-bold text-center mb-2">

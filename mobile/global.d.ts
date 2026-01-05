@@ -1,5 +1,5 @@
 declare module "*.png" {
-  const content: import("react-native").ImageRequireSource;
+  const content: any;
   export default content;
 }
 

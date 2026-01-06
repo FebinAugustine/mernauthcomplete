@@ -13,6 +13,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 import { useAuth } from "../context/AuthContext";
 import { getMyProfile } from "../api/user.api";
 import { getReportsByUser } from "../api/report.api";
@@ -21,8 +22,6 @@ import Reports from "../components/Reports";
 import AddReport from "../components/AddReport";
 import Profile from "../components/Profile";
 import Settings from "../components/Settings";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-// const logo = require("../assets/images/evapod_logo.png");
 
 export default function HomeScreen() {
   const { user, setUser, logout } = useAuth();
@@ -66,6 +65,10 @@ export default function HomeScreen() {
       fetchReports();
     }
   }, [activeTab, refreshProfile, fetchReports]);
+
+  useEffect(() => {
+    refreshProfile(); // Refresh profile on mount to ensure user details are loaded
+  }, [refreshProfile]);
 
   const renderContent = () => {
     if (loading) {
@@ -185,6 +188,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         ))}
       </View>
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 }

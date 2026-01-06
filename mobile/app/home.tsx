@@ -6,7 +6,9 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -20,7 +22,7 @@ import AddReport from "../components/AddReport";
 import Profile from "../components/Profile";
 import Settings from "../components/Settings";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const logo = require("../assets/images/evapod_logo.png");
+// const logo = require("../assets/images/evapod_logo.png");
 
 export default function HomeScreen() {
   const { user, setUser, logout } = useAuth();
@@ -68,7 +70,11 @@ export default function HomeScreen() {
   const renderContent = () => {
     if (loading) {
       return (
-        <View className="flex-1 items-center justify-center">
+        <View className="flex-1 items-center justify-center pt-50">
+          <Image
+            source={require("../assets/images/evapod_logo.png")}
+            style={{ width: 100, height: 100, resizeMode: "contain" }}
+          />
           <ActivityIndicator size="large" color="#3b82f6" />
         </View>
       );
@@ -125,17 +131,22 @@ export default function HomeScreen() {
       <View className="bg-white p-4 shadow">
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
-            <Text className="text-blue-700 text-lg font-bold">
+            <Image
+              source={require("../assets/images/evapod_logo.png")}
+              style={{ width: 30, height: 30, resizeMode: "contain" }}
+            />
+            <Text className="text-blue-700 text-lg font-bold ml-4">
               THE EVAPOD APP
             </Text>
           </View>
           <View className="flex-row items-center">
-            <Text className="text-gray-600 mr-4">Home</Text>
+            {/* <Text className="text-gray-600 mr-4">Home</Text> */}
             <TouchableOpacity
               onPress={handleLogout}
               className="bg-red-600 px-3 py-1 rounded"
             >
-              <Text className="text-white font-semibold">Logout</Text>
+              {/* show logout icon */}
+              <Ionicons name="log-out-outline" size={24} color="white" />
             </TouchableOpacity>
           </View>
         </View>

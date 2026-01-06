@@ -4,24 +4,24 @@ import {
   Text,
   View,
   ActivityIndicator,
-  TouchableOpacity,
-  Alert,
+  Image,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { router } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 
 export default function App() {
-  const { user, isLoading, isAuth, logout } = useAuth();
-
-  const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Logout", onPress: logout },
-    ]);
-  };
+  const { user, isLoading, isAuth } = useAuth();
+  const [isRedirecting, setIsRedirecting] = React.useState(false);
 
   React.useEffect(() => {
-    if (!isLoading) {
+    SplashScreen.preventAutoHideAsync();
+  }, []);
+
+
+  React.useEffect(() => {
+    if (!isLoading && !isRedirecting) {
+      setIsRedirecting(true);
       if (isAuth) {
         // User is authenticated, redirect based on role
         if (user?.role === "user") {
@@ -33,13 +33,25 @@ export default function App() {
         // User not authenticated, redirect to login
         router.replace("/login");
       }
+      // Hide splash after routing
+      setTimeout(() => {
+        SplashScreen.hideAsync();
+      }, 2000);
     }
-  }, [isLoading, isAuth, user]);
+  }, [isLoading, isAuth, user, isRedirecting]);
 
-  if (isLoading) {
+  if (isLoading || isRedirecting) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#3b82f6" />
+        <Image
+          source={require("../assets/images/evapod_logo.png")}
+          style={{ width: 200, height: 200, resizeMode: "contain" }}
+        />
+        <ActivityIndicator
+          size="large"
+          color="#3b82f6"
+          style={{ marginTop: 20 }}
+        />
       </View>
     );
   }
@@ -50,20 +62,16 @@ export default function App() {
 
   return (
     <View className="flex-1 items-center justify-center bg-white px-6">
-      <Text className="text-2xl font-bold text-gray-900 mb-2">
-        Welcome back, {user?.name}!
-      </Text>
-      <Text className="text-gray-600 text-center mb-8">
-        You are successfully logged in.
-      </Text>
-      <TouchableOpacity
-        className="w-full py-3 bg-red-600 rounded-lg"
-        onPress={handleLogout}
-      >
-        <Text className="text-white text-center font-semibold text-lg">
-          Logout
-        </Text>
-      </TouchableOpacity>
+      <Image
+        source={require("../assets/images/evapod_logo.png")}
+        style={{ width: 100, height: 100, resizeMode: "contain" }}
+      />
+      <Text>Welcome to Evapod!</Text>
+      <ActivityIndicator
+        size="large"
+        color="#3b82f6"
+        style={{ marginTop: 20 }}
+      />
     </View>
   );
 }

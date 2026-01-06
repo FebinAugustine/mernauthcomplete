@@ -63,8 +63,13 @@ export default function Reports({
     setIsModalOpen(true);
   };
 
-  const shareReport = async (report: any) => {
-    const message = `Report Details:\n\nType: ${report.typeOfReport}\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer: ${report.hearerName}\nStatus: ${report.status}\nLocation: ${report.location}`;
+  const shareReport = async (report: any, fullDetails: boolean = false) => {
+    let message = "";
+    if (fullDetails) {
+      message = `Full Report Details:\n\nFellowship: ${report.fellowship}\nType: ${report.typeOfReport}\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer: ${report.hearerName}\nHearers: ${report.noOfHearers}\nLocation: ${report.location}\nMobile: ${report.mobileNumber}\nStatus: ${report.status}\nRemarks: ${report.remarks || "N/A"}\nFollow Up: ${report.followUpStatus}\nNext Follow Up: ${report.nextFollowUpDate ? new Date(report.nextFollowUpDate).toLocaleDateString() : "N/A"}\nFollow Up Remarks: ${report.followUpRemarks || "N/A"}\nAppointment Date: ${report.appointmentDate ? new Date(report.appointmentDate).toLocaleDateString() : "N/A"}\nAppointment Time: ${report.appointmentTime || "N/A"}\nAppointment Location: ${report.appointmentLocation || "N/A"}\nAppointment Status: ${report.appointmentStatus}\nEvangelist Assigned: ${report.evangelistAssigned || "N/A"}\nAppointment Remarks: ${report.appointmentRemarks || "N/A"}\nSubmitted by: ${user.name}`;
+    } else {
+      message = `Report Details:\n\nType: ${report.typeOfReport}\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer: ${report.hearerName}\nStatus: ${report.status}\nPhone: ${report.mobileNumber}\nSubmitted by: ${user.name}`;
+    }
     try {
       await Share.share({ message });
     } catch (error) {
@@ -199,7 +204,7 @@ export default function Reports({
             <Text className="text-2xl">×</Text>
           </TouchableOpacity>
           {selectedReport && (
-            <View >
+            <View>
               <Text className="text-2xl font-bold mb-4">
                 {isEditing ? "Edit Report" : "Full Report Details"}
               </Text>
@@ -646,7 +651,7 @@ export default function Reports({
                 </View>
               ) : (
                 <TouchableOpacity
-                  onPress={() => shareReport(selectedReport)}
+                  onPress={() => shareReport(selectedReport, true)}
                   className="bg-green-500 px-4 py-2 rounded mt-4 self-center"
                 >
                   <Text className="text-white">Share Full Report</Text>

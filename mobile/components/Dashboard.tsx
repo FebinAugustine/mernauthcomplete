@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Share, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface DashboardProps {
   user: any;
@@ -29,6 +30,24 @@ export default function Dashboard({
     (r) => r.followUpStatus === "Attended"
   ).length;
 
+  const shareReportSummary = async () => {
+    const message = `Report Summary by ${user?.name}:\nTotal Reports: ${reports.length}\nPositive: ${positiveCount}\nNegative: ${negativeCount}\nNeutral: ${neutralCount}`;
+    try {
+      await Share.share({ message });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
+  const shareFollowUpSummary = async () => {
+    const message = `Follow-Up Status Summary by ${user?.name}:\n1st Contact: ${firstContactCount}\n2nd Contact: ${secondContactCount}\n3rd Contact: ${thirdContactCount}\nReady: ${readyCount}\nAttended: ${attendedCount}`;
+    try {
+      await Share.share({ message });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
   return (
     <ScrollView className="flex-1 p-4">
       <Text className="text-2xl font-bold text-blue-900 mb-4">
@@ -53,7 +72,12 @@ export default function Dashboard({
       </View>
 
       <View className="bg-white rounded-lg p-4 mb-4">
-        <Text className="text-xl font-semibold mb-4">Report Summary</Text>
+        <View className="flex-row justify-between items-center mb-4">
+          <Text className="text-xl font-semibold">Report Summary</Text>
+          <TouchableOpacity onPress={shareReportSummary}>
+            <Ionicons name="share-outline" size={24} color="#1e40af" />
+          </TouchableOpacity>
+        </View>
         <View className="flex-row justify-between">
           <View className="flex-1 bg-green-50 p-3 rounded-lg mr-2 items-center">
             <Text className="text-2xl mb-1">👍</Text>
@@ -80,9 +104,14 @@ export default function Dashboard({
       </View>
 
       <View className="bg-white rounded-lg p-4 mb-4">
-        <Text className="text-xl font-semibold mb-4">
-          Follow-Up Status Summary
-        </Text>
+        <View className="flex-row justify-between items-center mb-4">
+          <Text className="text-xl font-semibold">
+            Follow-Up Status Summary
+          </Text>
+          <TouchableOpacity onPress={shareFollowUpSummary}>
+            <Ionicons name="share-outline" size={24} color="#1e40af" />
+          </TouchableOpacity>
+        </View>
         <View className="flex-row flex-wrap justify-between">
           <View className="w-1/2 p-2">
             <View className="bg-blue-50 p-3 rounded-lg items-center">

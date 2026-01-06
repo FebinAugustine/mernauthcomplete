@@ -21,7 +21,7 @@ const Profile = ({ refreshProfile, setActiveTab }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user } = AppData();
 
-  console.log(user);
+  // console.log(user);
 
   const openEditModal = () => {
     if (user) {

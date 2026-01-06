@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Modal,
   Alert,
   Share,
+  FlatList,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -35,6 +36,12 @@ export default function Reports({
   const [currentDateField, setCurrentDateField] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const reportsPerPage = 5;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortOrder]);
 
   const openModal = (report: any) => {
     setSelectedReport(report);
@@ -66,14 +73,17 @@ export default function Reports({
   const shareReport = async (report: any, fullDetails: boolean = false) => {
     let message = "";
     if (fullDetails) {
-      message = `Full Report Details:\n\nFellowship: ${report.fellowship}\nType: ${report.typeOfReport}\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer: ${report.hearerName}\nHearers: ${report.noOfHearers}\nLocation: ${report.location}\nMobile: ${report.mobileNumber}\nStatus: ${report.status}\nRemarks: ${report.remarks || "N/A"}\nFollow Up: ${report.followUpStatus}\nNext Follow Up: ${report.nextFollowUpDate ? new Date(report.nextFollowUpDate).toLocaleDateString() : "N/A"}\nFollow Up Remarks: ${report.followUpRemarks || "N/A"}\nAppointment Date: ${report.appointmentDate ? new Date(report.appointmentDate).toLocaleDateString() : "N/A"}\nAppointment Time: ${report.appointmentTime || "N/A"}\nAppointment Location: ${report.appointmentLocation || "N/A"}\nAppointment Status: ${report.appointmentStatus}\nEvangelist Assigned: ${report.evangelistAssigned || "N/A"}\nAppointment Remarks: ${report.appointmentRemarks || "N/A"}\nSubmitted by: ${user.name}`;
+      message = `Full Report Details:\n\nFellowship: ${report.fellowship}\nType: ${report.typeOfReport}\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer: ${report.hearerName}\nHearers: ${report.noOfHearers}\nLocation: ${report.location}\nMobile: ${report.mobileNumber}\nStatus: ${report.status}\nRemarks: ${report.remarks || "N/A"}\nFollow Up: ${report.followUpStatus}\nNext Follow Up: ${report.nextFollowUpDate ? new Date(report.nextFollowUpDate).toLocaleDateString() : "N/A"}\nFollow Up Remarks: ${report.followUpRemarks || "N/A"}\nAppointment Date: ${report.appointmentDate ? new Date(report.appointmentDate).toLocaleDateString() : "N/A"}\nAppointment Time: ${report.appointmentTime || "N/A"}\nAppointment Location: ${report.appointmentLocation || "N/A"}\nAppointment Status: ${report.appointmentStatus}\nEvangelist Assigned: ${report.evangelistAssigned || "N/A"}\nAppointment Remarks: ${report.appointmentRemarks || "N/A"}\nSubmitted by: ${user?.name || "Unknown"}`;
     } else {
-      message = `Report Details:\n\nType: ${report.typeOfReport}\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer: ${report.hearerName}\nStatus: ${report.status}\nPhone: ${report.mobileNumber}\nSubmitted by: ${user.name}`;
+      message = `Report Details:\n\nType: ${report.typeOfReport}\nDate: ${new Date(report.date).toLocaleDateString()}\nHearer: ${report.hearerName}\nStatus: ${report.status}\nPhone: ${report.mobileNumber}\nSubmitted by: ${user?.name || "Unknown"}`;
     }
     try {
       await Share.share({ message });
     } catch (error) {
-      Alert.alert("Error", "Unable to share");
+      Alert.alert(
+        error instanceof Error ? error.message : "Error",
+        "Unable to share"
+      );
     }
   };
 
@@ -121,8 +131,57 @@ export default function Reports({
     }
   });
 
+  const totalPages = Math.ceil(sortedReports.length / reportsPerPage);
+  const paginatedReports = sortedReports.slice(
+    (currentPage - 1) * reportsPerPage,
+    currentPage * reportsPerPage
+  );
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const renderReportItem = ({ item }: { item: any }) => (
+    <View className="bg-white rounded-lg p-4 mb-2 shadow">
+      <View className="flex-row justify-between items-center">
+        <View>
+          <Text className="text-lg font-medium">
+            {item.typeOfReport} Report
+          </Text>
+          <Text>Status: {item.status}</Text>
+          <Text>Hearer: {item.hearerName}</Text>
+          <Text>Date: {new Date(item.date).toLocaleDateString()}</Text>
+        </View>
+        <View className="flex-row">
+          <TouchableOpacity
+            onPress={() => openModal(item)}
+            className="bg-blue-500 px-3 py-1 rounded mr-2"
+          >
+            <Ionicons name="eye" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => shareReport(item)}
+            className="bg-green-500 px-3 py-1 rounded mr-2"
+          >
+            <Ionicons name="share" size={20} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => openEditModal(item)}
+            className="bg-orange-500 px-3 py-1 rounded"
+          >
+            <Ionicons name="pencil" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
-    <ScrollView className="flex-1 p-4">
+    <View className="flex-1 p-4">
       <Text className="text-2xl font-bold text-blue-900 mb-4">
         Reports Submitted By: {user?.name}
       </Text>
@@ -150,47 +209,47 @@ export default function Reports({
         </TouchableOpacity>
       </View>
 
-      {/* Reports List */}
-      {sortedReports.length > 0 ? (
-        sortedReports.map((report) => (
-          <View
-            key={report._id}
-            className="bg-white rounded-lg p-4 mb-2 shadow"
+      <FlatList
+        data={paginatedReports}
+        renderItem={renderReportItem}
+        keyExtractor={(item) => item._id}
+        ListEmptyComponent={
+          <Text className="text-center text-gray-500">No reports found.</Text>
+        }
+        showsVerticalScrollIndicator={false}
+      />
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <View className="flex-row justify-between items-center mt-4">
+          <TouchableOpacity
+            onPress={goToPreviousPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded ${currentPage === 1 ? "bg-gray-300" : "bg-blue-500"}`}
           >
-            <View className="flex-row justify-between items-center">
-              <View>
-                <Text className="text-lg font-medium">
-                  {report.typeOfReport} Report
-                </Text>
-                <Text>Status: {report.status}</Text>
-                <Text>Hearer: {report.hearerName}</Text>
-                <Text>Date: {new Date(report.date).toLocaleDateString()}</Text>
-              </View>
-              <View className="flex-row">
-                <TouchableOpacity
-                  onPress={() => openModal(report)}
-                  className="bg-blue-500 px-3 py-1 rounded mr-2"
-                >
-                  <Ionicons name="eye" size={20} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => shareReport(report)}
-                  className="bg-green-500 px-3 py-1 rounded mr-2"
-                >
-                  <Ionicons name="share" size={20} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openEditModal(report)}
-                  className="bg-orange-500 px-3 py-1 rounded"
-                >
-                  <Ionicons name="pencil" size={20} color="white" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        ))
-      ) : (
-        <Text className="text-center text-gray-500">No reports found.</Text>
+            <Text
+              className={currentPage === 1 ? "text-gray-500" : "text-white"}
+            >
+              Previous
+            </Text>
+          </TouchableOpacity>
+          <Text>
+            Page {currentPage} of {totalPages}
+          </Text>
+          <TouchableOpacity
+            onPress={goToNextPage}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded ${currentPage === totalPages ? "bg-gray-300" : "bg-blue-500"}`}
+          >
+            <Text
+              className={
+                currentPage === totalPages ? "text-gray-500" : "text-white"
+              }
+            >
+              Next
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       {/* Modal */}
@@ -208,7 +267,7 @@ export default function Reports({
               <Text className="text-2xl font-bold mb-4">
                 {isEditing ? "Edit Report" : "Full Report Details"}
               </Text>
-              <ScrollView className="flex-1 pb-2">
+              <View className="flex-1 pb-2">
                 {isEditing ? (
                   <View className="space-y-4">
                     {/* Basic Information */}
@@ -633,7 +692,7 @@ export default function Reports({
                     </Text>
                   </View>
                 )}
-              </ScrollView>
+              </View>
               {isEditing ? (
                 <View className="flex-row justify-around mt-4 pb-2 mb-8">
                   <TouchableOpacity
@@ -669,6 +728,6 @@ export default function Reports({
           )}
         </ScrollView>
       </Modal>
-    </ScrollView>
+    </View>
   );
 }

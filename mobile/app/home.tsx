@@ -142,7 +142,11 @@ export default function HomeScreen() {
       </View>
 
       {/* Main Content */}
-      <ScrollView className="flex-1">{renderContent()}</ScrollView>
+      {activeTab === "reports" ? (
+        renderContent()
+      ) : (
+        <ScrollView className="flex-1">{renderContent()}</ScrollView>
+      )}
 
       {/* Bottom Navigation */}
       <View

@@ -9,6 +9,7 @@ import {
   Alert,
   Share,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ReportsProps {
   reports: any[];
@@ -116,13 +117,13 @@ export default function Reports({
                   onPress={() => openModal(report)}
                   className="bg-blue-500 px-3 py-1 rounded mr-2"
                 >
-                  <Text className="text-white">View</Text>
+                  <Ionicons name="eye" size={20} color="white" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => shareReport(report)}
                   className="bg-green-500 px-3 py-1 rounded"
                 >
-                  <Text className="text-white">Share</Text>
+                  <Ionicons name="share" size={20} color="white" />
                 </TouchableOpacity>
               </View>
             </View>

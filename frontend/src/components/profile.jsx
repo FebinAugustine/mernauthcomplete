@@ -29,7 +29,7 @@ const Profile = ({ refreshProfile, setActiveTab }) => {
         name: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
-        fellowship: user.fellowship || "",
+        fellowship: user.fellowship?.name || user.fellowship || "",
         address: user.address || "",
         gender: user.gender || "",
         dob: user.dob ? new Date(user.dob).toISOString().split("T")[0] : "",
@@ -215,7 +215,7 @@ const Profile = ({ refreshProfile, setActiveTab }) => {
                 Fellowship
               </label>
               <p className="text-lg text-gray-900 font-medium">
-                {user?.fellowship}
+                {user?.fellowship?.name || user?.fellowship || "Not specified"}
               </p>
             </div>
             <div>

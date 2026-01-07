@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Alert,
   Modal,
-  FlatList,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import {
@@ -34,7 +33,7 @@ const AddSubzone = () => {
     zone: "Kochi",
     zonalCoordinator: "",
     evngCoordinator: "",
-    totalMembers: "1",
+    totalMembers: "0",
   });
   const [loading, setLoading] = useState(false);
   const [subzones, setSubzones] = useState<Subzone[]>([]);
@@ -45,7 +44,7 @@ const AddSubzone = () => {
     zone: "Kochi",
     zonalCoordinator: "",
     evngCoordinator: "",
-    totalMembers: "1",
+    totalMembers: "0",
   });
   const [editLoading, setEditLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -96,7 +95,7 @@ const AddSubzone = () => {
         zone: "Kochi",
         zonalCoordinator: "",
         evngCoordinator: "",
-        totalMembers: "1",
+        totalMembers: "0",
       });
       // Update cache with new subzone
       if (result.subZone) {
@@ -169,9 +168,11 @@ const AddSubzone = () => {
               setSubzones((prev) =>
                 prev.filter((subzone) => subzone._id !== id)
               );
-            } catch (error) {
+            } catch (error: any) {
               console.error(error);
-              Alert.alert("Error", "Failed to delete subzone");
+              const errorMessage =
+                error.response?.data?.message || "Failed to delete subzone";
+              Alert.alert("Error", errorMessage);
             }
           },
         },

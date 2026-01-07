@@ -58,3 +58,40 @@ export const deleteSubzone = async (id: string) => {
     throw error;
   }
 };
+
+export const createFellowship = async (fellowshipData: any) => {
+  try {
+    const res = await api.post("/admin/create-fellowship", fellowshipData);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllFellowships = async () => {
+  try {
+    const res = await api.get("/admin/get-all-fellowships");
+    
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateFellowship = async (id: string, fellowshipData: any) => {
+  try {
+    const res = await api.put(`/admin/update-fellowship/${id}`, fellowshipData);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteFellowship = async (id: string) => {
+  try {
+    const res = await api.delete(`/admin/delete-fellowship/${id}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

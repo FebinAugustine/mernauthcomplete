@@ -24,6 +24,7 @@ import Profile from "../components/Profile";
 import Settings from "../components/Settings";
 import AdminDashboard from "../components/AdminDashboard";
 import AddSubzone from "../components/AddSubzone";
+import AddFellowship from "../components/AddFellowship";
 
 export default function AdminScreen() {
   const { user, setUser, logout } = useAuth();
@@ -107,6 +108,8 @@ export default function AdminScreen() {
         return <AddReport user={user} setActiveTab={setActiveTab} />;
       case "add-subzone":
         return <AddSubzone />;
+      case "add-fellowship":
+        return <AddFellowship />;
       case "dashboard":
         return <AdminDashboard />;
       case "profile":
@@ -128,6 +131,7 @@ export default function AdminScreen() {
     { id: "reports", label: "Reports", icon: "📊" },
     { id: "add-report", label: "Add", icon: "➕" },
     { id: "add-subzone", label: "Subzone", icon: "🏘️" },
+    { id: "add-fellowship", label: "Fellowship", icon: "⛪" },
     { id: "dashboard", label: "Dashboard", icon: "📈" },
     { id: "profile", label: "Profile", icon: "👤" },
     { id: "settings", label: "Settings", icon: "⚙️" },
@@ -164,7 +168,9 @@ export default function AdminScreen() {
       </View>
 
       {/* Main Content */}
-      {activeTab === "reports" || activeTab === "add-subzone" ? (
+      {activeTab === "reports" ||
+      activeTab === "add-subzone" ||
+      activeTab === "add-fellowship" ? (
         renderContent()
       ) : (
         <ScrollView className="flex-1">{renderContent()}</ScrollView>

@@ -61,6 +61,7 @@ export const getFellowship = TryCatch(async (req, res) => {
             message: "Fellowship not found",
         });
     }
+    console.log(fellowship);
     res.json({
         message: "Fellowship found",
         fellowship,

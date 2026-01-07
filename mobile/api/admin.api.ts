@@ -71,7 +71,6 @@ export const createFellowship = async (fellowshipData: any) => {
 export const getAllFellowships = async () => {
   try {
     const res = await api.get("/admin/get-all-fellowships");
-    
     return res.data;
   } catch (error) {
     throw error;
@@ -90,6 +89,42 @@ export const updateFellowship = async (id: string, fellowshipData: any) => {
 export const deleteFellowship = async (id: string) => {
   try {
     const res = await api.delete(`/admin/delete-fellowship/${id}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createNewUser = async (userData: any) => {
+  try {
+    const res = await api.post("/admin/create-user", userData);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const res = await api.get("/admin/get-all-users");
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateUser = async (id: string, userData: any) => {
+  try {
+    const res = await api.put(`/admin/update-user/${id}`, userData);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUser = async (id: string) => {
+  try {
+    const res = await api.delete(`/admin/delete-user/${id}`);
     return res.data;
   } catch (error) {
     throw error;

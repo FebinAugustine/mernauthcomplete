@@ -22,3 +22,39 @@ export const getUsersWithReportsPaginated = async (
     throw error;
   }
 };
+
+export const createSubzone = async (subzoneData: any) => {
+  try {
+    const res = await api.post("/admin/create-subzone", subzoneData);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllSubzones = async () => {
+  try {
+    const res = await api.get("/admin/get-all-subzones");
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateSubzone = async (id: string, subzoneData: any) => {
+  try {
+    const res = await api.put(`/admin/update-subzone/${id}`, subzoneData);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteSubzone = async (id: string) => {
+  try {
+    const res = await api.delete(`/admin/delete-subzone/${id}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

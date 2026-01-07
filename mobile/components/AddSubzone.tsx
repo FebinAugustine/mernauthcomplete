@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -65,14 +65,14 @@ const AddSubzone = () => {
     fetchSubzones();
   }, []);
 
-  const handleChange = (name: string, value: string) => {
+  const handleChange = useCallback((name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (
       !formData.name ||
       !formData.zonalCoordinator ||
@@ -108,9 +108,9 @@ const AddSubzone = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData]);
 
-  const handleEdit = (subzone: Subzone) => {
+  const handleEdit = useCallback((subzone: Subzone) => {
     setEditingSubzone(subzone);
     setEditFormData({
       name: subzone.name,
@@ -120,9 +120,9 @@ const AddSubzone = () => {
       totalMembers: subzone.totalMembers.toString(),
     });
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleEditSubmit = async () => {
+  const handleEditSubmit = useCallback(async () => {
     if (!editingSubzone) return;
 
     setEditLoading(true);
@@ -150,9 +150,9 @@ const AddSubzone = () => {
     } finally {
       setEditLoading(false);
     }
-  };
+  }, [editingSubzone, editFormData]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     Alert.alert(
       "Delete Subzone",
       "Are you sure you want to delete this subzone?",
@@ -177,199 +177,300 @@ const AddSubzone = () => {
         },
       ]
     );
-  };
+  }, []);
 
-  const handleEditChange = (name: string, value: string) => {
+  const handleEditChange = useCallback((name: string, value: string) => {
     setEditFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
-
-  const renderSubzoneItem = ({ item }: { item: Subzone }) => (
-    <View className="bg-white rounded-lg shadow-md border border-gray-400 p-4 mb-4 mx-2">
-      <View className="flex-row justify-between items-start mb-4">
-        <View className="flex-1">
-          <Text className="text-lg font-bold text-gray-900 mb-2">
-            {item.name}
-          </Text>
-          <View className="bg-blue-100 px-2 py-1 rounded-full self-start">
-            <Text className="text-xs font-medium text-blue-800">
-              {item.zone}
-            </Text>
-          </View>
-        </View>
-        <View className="flex-row">
-          <TouchableOpacity
-            onPress={() => handleEdit(item)}
-            className="p-2 mr-2 bg-gray-100 rounded"
-          >
-            <Text className="text-blue-600">✏️</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleDelete(item._id)}
-            className="p-2 bg-gray-100 rounded"
-          >
-            <Text className="text-red-600">🗑️</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View className="space-y-2">
-        <View className="flex-row">
-          <Text className="font-medium w-24 text-sm text-gray-600">
-            Zonal Coord:
-          </Text>
-          <Text className="text-sm text-gray-800">
-            {item.zonalCoordinator?.name || "N/A"}
-          </Text>
-        </View>
-        <View className="flex-row">
-          <Text className="font-medium w-24 text-sm text-gray-600">
-            Evng Coord:
-          </Text>
-          <Text className="text-sm text-gray-800">
-            {item.evngCoordinator?.name || "N/A"}
-          </Text>
-        </View>
-        <View className="flex-row">
-          <Text className="font-medium w-24 text-sm text-gray-600">
-            Members:
-          </Text>
-          <Text className="text-sm text-gray-800">
-            {item.totalMembers || 0}
-          </Text>
-        </View>
-      </View>
-
-      <View className="mt-4 pt-4 border-t border-gray-100">
-        <Text className="text-xs text-gray-500">
-          Created: {new Date(item.createdAt).toLocaleDateString()}
-        </Text>
-      </View>
-    </View>
-  );
+  }, []);
 
   return (
-    <FlatList
-      data={subzones}
-      renderItem={renderSubzoneItem}
-      keyExtractor={(item) => item._id}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ padding: 16 }}
-      ListHeaderComponent={() => (
-        <>
-          <Text className="text-3xl font-bold text-gray-900 mb-6">
-            Add Subzone
-          </Text>
+    <ScrollView className="flex-1 p-4">
+      <Text className="text-3xl font-bold text-gray-900 mb-6">Add Subzone</Text>
 
-          {/* Add Form */}
-          <View className="bg-white rounded-lg shadow p-4 mb-6">
-            <View className="space-y-4">
-              {/* Name */}
-              <View>
-                <Text className="text-sm font-medium text-gray-700 mb-1">
-                  Subzone Name *
-                </Text>
-                <TextInput
-                  value={formData.name}
-                  onChangeText={(value) => handleChange("name", value)}
-                  className="border border-gray-300 rounded-md p-2"
-                  placeholder="Enter subzone name"
-                />
-              </View>
+      {/* Add Form */}
+      <View className="bg-white rounded-lg shadow p-4 mb-6">
+        <View className="space-y-4">
+          {/* Name */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-1">
+              Subzone Name *
+            </Text>
+            <TextInput
+              value={formData.name}
+              onChangeText={(value) => handleChange("name", value)}
+              className="border border-gray-300 rounded-md p-2"
+              placeholder="Enter subzone name"
+            />
+          </View>
 
-              {/* Zone */}
-              <View>
-                <Text className="text-sm font-medium text-gray-700 mb-1">
-                  Zone *
+          {/* Zone */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-1">
+              Zone *
+            </Text>
+            <View className="border border-gray-300 rounded-md">
+              <Picker
+                selectedValue={formData.zone}
+                onValueChange={(value) => handleChange("zone", value)}
+              >
+                <Picker.Item label="Kochi" value="Kochi" />
+              </Picker>
+            </View>
+          </View>
+
+          {/* Zonal Coordinator */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-1">
+              Zonal Coordinator Zion ID *
+            </Text>
+            <TextInput
+              value={formData.zonalCoordinator}
+              onChangeText={(value) => handleChange("zonalCoordinator", value)}
+              className="border border-gray-300 rounded-md p-2"
+              placeholder="Enter Zion ID"
+              keyboardType="numeric"
+            />
+          </View>
+
+          {/* Evangelism Coordinator */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-1">
+              Evangelism Coordinator Zion ID *
+            </Text>
+            <TextInput
+              value={formData.evngCoordinator}
+              onChangeText={(value) => handleChange("evngCoordinator", value)}
+              className="border border-gray-300 rounded-md p-2"
+              placeholder="Enter Zion ID"
+              keyboardType="numeric"
+            />
+          </View>
+
+          {/* Total Members */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-1">
+              Total Members *
+            </Text>
+            <TextInput
+              value={formData.totalMembers}
+              onChangeText={(value) => handleChange("totalMembers", value)}
+              className="border border-gray-300 rounded-md p-2"
+              placeholder="Enter total members"
+              keyboardType="numeric"
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={loading}
+            className="bg-indigo-600 p-3 rounded-md"
+          >
+            <Text className="text-white text-center font-medium">
+              {loading ? "Adding Subzone..." : "Add Subzone"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Subzones List Header */}
+      <Text className="text-2xl font-bold text-gray-900 mb-4">
+        Existing Subzones
+      </Text>
+
+      {subzonesLoading ? (
+        <View className="items-center justify-center py-8">
+          <ActivityIndicator size="large" color="#3b82f6" />
+        </View>
+      ) : subzones.length === 0 ? (
+        <Text className="text-center py-8 text-gray-500">
+          No subzones found.
+        </Text>
+      ) : (
+        subzones.map((item) => (
+          <View
+            key={item._id}
+            className="bg-white rounded-lg shadow-md border border-gray-400 p-4 mb-4 mx-2"
+          >
+            <View className="flex-row justify-between items-start mb-4">
+              <View className="flex-1">
+                <Text className="text-lg font-bold text-gray-900 mb-2">
+                  {item.name}
                 </Text>
-                <View className="border border-gray-300 rounded-md">
-                  <Picker
-                    selectedValue={formData.zone}
-                    onValueChange={(value) => handleChange("zone", value)}
-                  >
-                    <Picker.Item label="Kochi" value="Kochi" />
-                  </Picker>
+                <View className="bg-blue-100 px-2 py-1 rounded-full self-start">
+                  <Text className="text-xs font-medium text-blue-800">
+                    {item.zone}
+                  </Text>
                 </View>
               </View>
-
-              {/* Zonal Coordinator */}
-              <View>
-                <Text className="text-sm font-medium text-gray-700 mb-1">
-                  Zonal Coordinator Zion ID *
-                </Text>
-                <TextInput
-                  value={formData.zonalCoordinator}
-                  onChangeText={(value) =>
-                    handleChange("zonalCoordinator", value)
-                  }
-                  className="border border-gray-300 rounded-md p-2"
-                  placeholder="Enter Zion ID"
-                  keyboardType="numeric"
-                />
+              <View className="flex-row">
+                <TouchableOpacity
+                  onPress={() => handleEdit(item)}
+                  className="p-2 mr-2 bg-gray-100 rounded"
+                >
+                  <Text className="text-blue-600">✏️</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleDelete(item._id)}
+                  className="p-2 bg-gray-100 rounded"
+                >
+                  <Text className="text-red-600">🗑️</Text>
+                </TouchableOpacity>
               </View>
+            </View>
 
-              {/* Evangelism Coordinator */}
-              <View>
-                <Text className="text-sm font-medium text-gray-700 mb-1">
-                  Evangelism Coordinator Zion ID *
+            <View className="space-y-2">
+              <View className="flex-row">
+                <Text className="font-medium w-24 text-sm text-gray-600">
+                  Zonal Coord:
                 </Text>
-                <TextInput
-                  value={formData.evngCoordinator}
-                  onChangeText={(value) =>
-                    handleChange("evngCoordinator", value)
-                  }
-                  className="border border-gray-300 rounded-md p-2"
-                  placeholder="Enter Zion ID"
-                  keyboardType="numeric"
-                />
-              </View>
-
-              {/* Total Members */}
-              <View>
-                <Text className="text-sm font-medium text-gray-700 mb-1">
-                  Total Members *
+                <Text className="text-sm text-gray-800">
+                  {item.zonalCoordinator?.name || "N/A"}
                 </Text>
-                <TextInput
-                  value={formData.totalMembers}
-                  onChangeText={(value) => handleChange("totalMembers", value)}
-                  className="border border-gray-300 rounded-md p-2"
-                  placeholder="Enter total members"
-                  keyboardType="numeric"
-                />
               </View>
+              <View className="flex-row">
+                <Text className="font-medium w-24 text-sm text-gray-600">
+                  Evng Coord:
+                </Text>
+                <Text className="text-sm text-gray-800">
+                  {item.evngCoordinator?.name || "N/A"}
+                </Text>
+              </View>
+              <View className="flex-row">
+                <Text className="font-medium w-24 text-sm text-gray-600">
+                  Members:
+                </Text>
+                <Text className="text-sm text-gray-800">
+                  {item.totalMembers || 0}
+                </Text>
+              </View>
+            </View>
 
+            <View className="mt-4 pt-4 border-t border-gray-100">
+              <Text className="text-xs text-gray-500">
+                Created: {new Date(item.createdAt).toLocaleDateString()}
+              </Text>
+            </View>
+          </View>
+        ))
+      )}
+
+      {/* Edit Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="bg-white rounded-lg p-6 w-11/12 max-w-md">
+            <Text className="text-lg font-semibold text-gray-900 mb-4">
+              Edit Subzone
+            </Text>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View className="space-y-4">
+                {/* Name */}
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">
+                    Subzone Name *
+                  </Text>
+                  <TextInput
+                    value={editFormData.name}
+                    onChangeText={(value) => handleEditChange("name", value)}
+                    className="border border-gray-300 rounded-md p-2"
+                    placeholder="Enter subzone name"
+                  />
+                </View>
+
+                {/* Zone */}
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">
+                    Zone *
+                  </Text>
+                  <View className="border border-gray-300 rounded-md">
+                    <Picker
+                      selectedValue={editFormData.zone}
+                      onValueChange={(value) => handleEditChange("zone", value)}
+                    >
+                      <Picker.Item label="Kochi" value="Kochi" />
+                    </Picker>
+                  </View>
+                </View>
+
+                {/* Zonal Coordinator */}
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">
+                    Zonal Coordinator Zion ID *
+                  </Text>
+                  <TextInput
+                    value={editFormData.zonalCoordinator}
+                    onChangeText={(value) =>
+                      handleEditChange("zonalCoordinator", value)
+                    }
+                    className="border border-gray-300 rounded-md p-2"
+                    placeholder="Enter Zion ID"
+                    keyboardType="numeric"
+                  />
+                </View>
+
+                {/* Evangelism Coordinator */}
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">
+                    Evangelism Coordinator Zion ID *
+                  </Text>
+                  <TextInput
+                    value={editFormData.evngCoordinator}
+                    onChangeText={(value) =>
+                      handleEditChange("evngCoordinator", value)
+                    }
+                    className="border border-gray-300 rounded-md p-2"
+                    placeholder="Enter Zion ID"
+                    keyboardType="numeric"
+                  />
+                </View>
+
+                {/* Total Members */}
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">
+                    Total Members *
+                  </Text>
+                  <TextInput
+                    value={editFormData.totalMembers}
+                    onChangeText={(value) =>
+                      handleEditChange("totalMembers", value)
+                    }
+                    className="border border-gray-300 rounded-md p-2"
+                    placeholder="Enter total members"
+                    keyboardType="numeric"
+                  />
+                </View>
+              </View>
+            </ScrollView>
+
+            <View className="flex-row justify-end space-x-3 pt-4">
               <TouchableOpacity
-                onPress={handleSubmit}
-                disabled={loading}
-                className="bg-indigo-600 p-3 rounded-md"
+                onPress={() => setModalVisible(false)}
+                className="px-4 py-2 bg-gray-200 rounded-md"
               >
-                <Text className="text-white text-center font-medium">
-                  {loading ? "Adding Subzone..." : "Add Subzone"}
+                <Text className="text-gray-700">Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleEditSubmit}
+                disabled={editLoading}
+                className="px-4 py-2 bg-blue-600 rounded-md"
+              >
+                <Text className="text-white">
+                  {editLoading ? "Updating..." : "Update Subzone"}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* Subzones List Header */}
-          <Text className="text-2xl font-bold text-gray-900 mb-4">
-            Existing Subzones
-          </Text>
-        </>
-      )}
-      ListEmptyComponent={() =>
-        subzonesLoading ? (
-          <View className="items-center justify-center py-8">
-            <ActivityIndicator size="large" color="#3b82f6" />
-          </View>
-        ) : (
-          <Text className="text-center py-8 text-gray-500">
-            No subzones found.
-          </Text>
-        )
-      }
-    />
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
 

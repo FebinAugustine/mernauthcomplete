@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  FlatList,
   ActivityIndicator,
   Alert,
   Modal,
@@ -16,6 +17,7 @@ import {
   updateUser,
   deleteUser,
 } from "../api/admin.api";
+import { getReportsByUserId } from "../api/report.api";
 
 interface User {
   _id: string;
@@ -65,15 +67,21 @@ const AddUser = () => {
   });
   const [editLoading, setEditLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [reportsModalVisible, setReportsModalVisible] = useState(false);
+  const [userReports, setUserReports] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [reportsLoading, setReportsLoading] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const data = await getAllUsers();
+        const timeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Timeout")), 10000)
+        );
+        const data = await Promise.race([getAllUsers(), timeout]);
         setUsers(data.users || []);
       } catch (error) {
         console.error("Failed to fetch users", error);
-        Alert.alert("Error", "Failed to load users");
       } finally {
         setUsersLoading(false);
       }
@@ -221,6 +229,24 @@ const AddUser = () => {
       ...prev,
       [name]: value,
     }));
+  }, []);
+
+  const handleViewReports = useCallback(async (user: User) => {
+    setSelectedUser(user);
+    setReportsLoading(true);
+    try {
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), 10000)
+      );
+      const data = await Promise.race([getReportsByUserId(user._id), timeout]);
+
+      setUserReports(data.reports || []);
+      setReportsModalVisible(true);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setReportsLoading(false);
+    }
   }, []);
 
   const filteredUsers = users.filter((user) => {
@@ -486,6 +512,12 @@ const AddUser = () => {
                   className="p-2 bg-gray-100 rounded"
                 >
                   <Text className="text-red-600">🗑️</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleViewReports(item)}
+                  className="p-2 bg-gray-100 rounded"
+                >
+                  <Text className="text-green-600">📊</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -756,6 +788,72 @@ const AddUser = () => {
             </View>
           </View>
         </View>
+      </Modal>
+
+      {/* Reports Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={reportsModalVisible}
+        onRequestClose={() => setReportsModalVisible(false)}
+      >
+        <TouchableOpacity
+          className="flex-1 justify-center items-center bg-black bg-opacity-50 pt-12 pb-12"
+          onPress={() => setReportsModalVisible(false)}
+          activeOpacity={1}
+        >
+          <TouchableOpacity
+            className="bg-white rounded-lg p-6 w-11/12 max-h-3/4"
+            activeOpacity={1}
+            onPress={() => {}}
+          >
+            <Text className="text-lg font-semibold text-gray-900 mb-4 mt-20">
+              Reports for {selectedUser?.name}
+            </Text>
+            {reportsLoading ? (
+              <View className="items-center justify-center py-8">
+                <ActivityIndicator size="large" color="#3b82f6" />
+              </View>
+            ) : (
+              <FlatList
+                data={userReports}
+                renderItem={({ item, index }) => (
+                  <View className="mb-4 p-4 bg-gray-50 rounded">
+                    <Text className="text-sm text-gray-800">
+                      Date: {new Date(item.date).toLocaleDateString()}
+                    </Text>
+                    <Text className="text-sm text-gray-800">
+                      Report Type: {item.typeOfReport}
+                    </Text>
+                    <Text className="text-sm text-gray-800">
+                      Hearer Name: {item.hearerName}
+                    </Text>
+                    <Text className="text-sm text-gray-800">
+                      Status: {item.status}
+                    </Text>
+                    <Text className="text-sm text-gray-800">
+                      Place: {item.location}
+                    </Text>
+                    <Text className="text-sm text-gray-800">
+                      Phone: {item.mobileNumber}
+                    </Text>
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+                ListEmptyComponent={
+                  <Text className="text-center py-4">No reports found.</Text>
+                }
+                showsVerticalScrollIndicator={false}
+              />
+            )}
+            <TouchableOpacity
+              onPress={() => setReportsModalVisible(false)}
+              className="mt-4 px-4 py-2 bg-blue-600 rounded-md self-center mb-20"
+            >
+              <Text className="text-white">Close</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </ScrollView>
   );

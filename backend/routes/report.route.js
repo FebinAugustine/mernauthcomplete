@@ -11,6 +11,7 @@ import {
     getReportsByStatus,
     getReportsByFollowUpStatus,
     getReportsByUser,
+    getReportsByUserId,
 } from "../controllers/report.controller.js";
 import { isAuth } from "../middlewares/isAuth.js";
 import { getAllFellowships } from "../controllers/fellowship.controller.js";
@@ -23,6 +24,7 @@ router.get("/fellowship/:fellowship", isAuth, getReportsByFellowship);
 router.get("/status/:status", isAuth, getReportsByStatus);
 router.get("/followup/:followUpStatus", isAuth, getReportsByFollowUpStatus);
 router.get("/report-by-user", isAuth, getReportsByUser);
+router.get("/user/:userId", isAuth, getReportsByUserId);
 router.get("/:id", isAuth, getReport);
 router.put("/:id", isAuth, updateReport);
 router.delete("/:id", isAuth, deleteReport);

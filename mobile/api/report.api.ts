@@ -9,6 +9,15 @@ export const getReportsByUser = async () => {
   }
 };
 
+export const getReportsByUserId = async (userId: string) => {
+  try {
+    const res = await api.get(`/user/${userId}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const createReport = async (reportData: any) => {
   try {
     const res = await api.post("/create", reportData);

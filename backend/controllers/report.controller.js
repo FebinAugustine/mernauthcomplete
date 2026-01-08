@@ -17,7 +17,7 @@ export const createReport = TryCatch(async (req, res) => {
     await report.save();
     // add report to the user's reports array
     await User.findByIdAndUpdate(req.user._id, { $push: { reports: report._id } });
-    
+
     res.status(201).json({
         message: "Report created successfully",
         report,
@@ -106,6 +106,15 @@ export const getReportsByFollowUpStatus = TryCatch(async (req, res) => {
 
 export const getReportsByUser = TryCatch(async (req, res) => {
     const userId = req.user._id;
+    const reports = await Report.find({ user: userId }).populate("user").populate("fellowship");
+    res.json({
+        message: "Reports found",
+        reports,
+    });
+});
+
+export const getReportsByUserId = TryCatch(async (req, res) => {
+    const { userId } = req.params;
     const reports = await Report.find({ user: userId }).populate("user").populate("fellowship");
     res.json({
         message: "Reports found",

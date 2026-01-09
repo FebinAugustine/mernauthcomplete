@@ -7,14 +7,17 @@ import {
 } from "../api/admin.api";
 import { toast } from "react-toastify";
 import { Edit, Trash2 } from "lucide-react";
+import { AppData } from "../context/AppContext";
 
 const AddSubzone = () => {
+  const { user } = AppData();
+
   const [formData, setFormData] = useState({
     name: "",
-    zone: "Kochi",
-    zonalCoordinator: "",
+    zone: user?.zone || "Not Found",
+    zonalCoordinator: user?.zionId || "Not Found",
     evngCoordinator: "",
-    totalMembers: 1,
+    totalMembers: 0,
   });
   const [loading, setLoading] = useState(false);
   const [subzones, setSubzones] = useState([]);
@@ -22,7 +25,7 @@ const AddSubzone = () => {
   const [editingSubzone, setEditingSubzone] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: "",
-    zone: "Kochi",
+    zone: user?.zone || "Not Found",
     zonalCoordinator: "",
     evngCoordinator: "",
     totalMembers: 1,
@@ -44,6 +47,13 @@ const AddSubzone = () => {
     fetchSubzones();
   }, []);
 
+  useEffect(() => {
+    if (user?.zone) {
+      setFormData((prev) => ({ ...prev, zone: user.zone }));
+      setEditFormData((prev) => ({ ...prev, zone: user.zone }));
+    }
+  }, [user]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -60,7 +70,7 @@ const AddSubzone = () => {
       toast.success("Subzone added successfully!");
       setFormData({
         name: "",
-        zone: "Kochi",
+        zone: user?.zone || "Not Found",
         zonalCoordinator: "",
         evngCoordinator: "",
         totalMembers: 1,
@@ -166,7 +176,7 @@ const AddSubzone = () => {
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                 required
               >
-                <option value="Kochi">Kochi</option>
+                <option value={formData.zone}>{formData.zone}</option>
               </select>
             </div>
 
@@ -337,7 +347,9 @@ const AddSubzone = () => {
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                     required
                   >
-                    <option value="Kochi">Kochi</option>
+                    <option value={editFormData.zone}>
+                      {editFormData.zone}
+                    </option>
                   </select>
                 </div>
 

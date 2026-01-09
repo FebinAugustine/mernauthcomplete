@@ -65,6 +65,11 @@ const schema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subzone",
     },
+    zone: {
+      type: String,
+      enum: [ "Kochi", "Ernakulam", "Varappuzha", "Pala", "Zion" ],
+      default: "Kochi",
+    },
     reports: [ {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Report",

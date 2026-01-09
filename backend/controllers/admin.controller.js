@@ -98,6 +98,7 @@ export const getUsersPaginated = TryCatch(async (req, res) => {
 
     const users = await User.find(query)
         .populate('fellowship', 'name')
+        .populate('subZone', 'name')
         .sort({ name: 1 })
         .skip((page - 1) * limit)
         .limit(limit);

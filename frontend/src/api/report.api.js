@@ -109,3 +109,13 @@ export const getReportsByUser = async () => {
 
     }
 };
+
+// Get reports by user ID with pagination
+export const getReportsByUserId = async (userId, page = 1, limit = 5) => {
+    try {
+        const res = await api.get(`/user/${userId}?page=${page}&limit=${limit}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};

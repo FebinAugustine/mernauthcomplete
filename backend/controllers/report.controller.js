@@ -115,10 +115,28 @@ export const getReportsByUser = TryCatch(async (req, res) => {
 
 export const getReportsByUserId = TryCatch(async (req, res) => {
     const { userId } = req.params;
-    const reports = await Report.find({ user: userId }).populate("user").populate("fellowship");
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    const reports = await Report.find({ user: userId })
+        .populate("user")
+        .populate("fellowship")
+        .skip(skip)
+        .limit(limit);
+
+    const totalReports = await Report.countDocuments({ user: userId });
+
     res.json({
         message: "Reports found",
         reports,
+        pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(totalReports / limit),
+            totalReports,
+            hasNext: page * limit < totalReports,
+            hasPrev: page > 1,
+        },
     });
 });
 

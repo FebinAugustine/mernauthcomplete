@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import {
   createNewUser,
-  getAllUsers,
+  getUsersPaginated,
   updateUser,
   deleteUser,
 } from "../api/admin.api";
+import { getReportsByUserId } from "../api/report.api";
 import { toast } from "react-toastify";
-import { Edit, Trash2 } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
@@ -40,6 +47,15 @@ const AddUser = () => {
   });
   const [editLoading, setEditLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [showReportsModal, setShowReportsModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userReports, setUserReports] = useState([]);
+  const [reportsLoading, setReportsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [userCurrentPage, setUserCurrentPage] = useState(1);
+  const [userTotalPages, setUserTotalPages] = useState(1);
+  const [searchTimeout, setSearchTimeout] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,6 +89,7 @@ const AddUser = () => {
       // Update cache with new user
       if (result.user) {
         setUsers((prev) => [...prev, result.user]);
+        fetchUsers(userCurrentPage); // Refetch to update pagination and list
       }
     } catch (error) {
       console.error(error.data);
@@ -83,19 +100,29 @@ const AddUser = () => {
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await getAllUsers();
-        setUsers(data.users || []);
-      } catch (error) {
-        console.error("Failed to fetch users", error);
-        toast.error("Failed to load users");
-      } finally {
-        setUsersLoading(false);
-      }
+    fetchUsers(userCurrentPage, search);
+  }, [userCurrentPage]);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) clearTimeout(searchTimeout);
     };
-    fetchUsers();
-  }, []);
+  }, [searchTimeout]);
+
+  const fetchUsers = async (page = 1, searchParam = search) => {
+    setUsersLoading(true);
+    try {
+      const data = await getUsersPaginated(page, 6, searchParam);
+      setUsers(data.users || []);
+      setUserTotalPages(data.pages || 1);
+      setUserCurrentPage(data.page || 1);
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+      toast.error("Failed to load users");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
 
   const handleEdit = (user) => {
     setEditingUser(user);
@@ -130,6 +157,7 @@ const AddUser = () => {
             user._id === editingUser._id ? result.user : user
           )
         );
+        fetchUsers(userCurrentPage); // Refetch to update pagination and list
       }
     } catch (error) {
       console.error(error);
@@ -145,7 +173,15 @@ const AddUser = () => {
       await deleteUser(id);
       toast.success("User deleted successfully!");
       // Update cache by removing deleted user
-      setUsers((prev) => prev.filter((user) => user._id !== id));
+      setUsers((prev) => {
+        const newUsers = prev.filter((user) => user._id !== id);
+        if (newUsers.length === 0 && userCurrentPage > 1) {
+          setUserCurrentPage(userCurrentPage - 1);
+        } else {
+          fetchUsers(userCurrentPage);
+        }
+        return newUsers;
+      });
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete user");
@@ -160,16 +196,39 @@ const AddUser = () => {
     }));
   };
 
-  const filteredUsers = users.filter((user) => {
-    if (!search) return true;
-    const searchLower = search.toLowerCase();
-    return (
-      user.name.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower) ||
-      user.phone.toString().includes(searchLower) ||
-      user.zionId.toString().includes(searchLower)
-    );
-  });
+  const handleViewReports = async (user) => {
+    setSelectedUser(user);
+    setShowReportsModal(true);
+    setCurrentPage(1);
+    await fetchUserReports(user._id, 1);
+  };
+
+  const fetchUserReports = async (userId, page) => {
+    setReportsLoading(true);
+    try {
+      const data = await getReportsByUserId(userId, page, 5);
+      setUserReports(data.reports || []);
+      setTotalPages(data.pagination?.totalPages || 1);
+      setCurrentPage(data.pagination?.currentPage || 1);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load reports");
+      setUserReports([]);
+      setTotalPages(1);
+    } finally {
+      setReportsLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchUserReports(selectedUser._id, newPage);
+    }
+  };
+
+  // No need for client-side filtering since we use server-side search
+  const filteredUsers = users;
 
   return (
     <div className="p-6">
@@ -370,7 +429,20 @@ const AddUser = () => {
             type="text"
             placeholder="Search users by name, email, phone, or Zion ID..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearch(value);
+              setUserCurrentPage(1); // Reset to first page on search
+              if (searchTimeout) clearTimeout(searchTimeout);
+              if (value === "") {
+                fetchUsers(1, value);
+              } else {
+                const timeout = setTimeout(() => {
+                  fetchUsers(1, value);
+                }, 500);
+                setSearchTimeout(timeout);
+              }
+            }}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
@@ -391,7 +463,7 @@ const AddUser = () => {
                 key={user._id}
                 className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200"
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex flex-col items-start justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">
                     {user.name}
                   </h3>
@@ -421,13 +493,22 @@ const AddUser = () => {
                     >
                       <Trash2 size={16} />
                     </button>
+                    <button
+                      onClick={() => handleViewReports(user)}
+                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      title="View user reports"
+                    >
+                      <FileText size={16} />
+                    </button>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex items-center text-sm text-gray-600">
                     <span className="font-medium w-20">Email:</span>
-                    <span>{user.email}</span>
+                    <span className="overflow-hidden wrap-anywhere">
+                      {user.email}
+                    </span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <span className="font-medium w-20">Phone:</span>
@@ -472,6 +553,29 @@ const AddUser = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        {userTotalPages > 1 && (
+          <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+            <button
+              onClick={() => setUserCurrentPage(userCurrentPage - 1)}
+              disabled={userCurrentPage === 1}
+              className="flex items-center px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={16} className="mr-1" />
+              Previous
+            </button>
+            <span className="text-sm text-gray-600">
+              Page {userCurrentPage} of {userTotalPages}
+            </span>
+            <button
+              onClick={() => setUserCurrentPage(userCurrentPage + 1)}
+              disabled={userCurrentPage === userTotalPages}
+              className="flex items-center px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+              <ChevronRight size={16} className="ml-1" />
+            </button>
           </div>
         )}
       </div>
@@ -649,6 +753,98 @@ const AddUser = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reports Modal */}
+      {showReportsModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Reports by {selectedUser.name}
+                </h3>
+                <button
+                  onClick={() => setShowReportsModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+              {reportsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                </div>
+              ) : userReports.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No reports found for this user.
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {/* console.log(userReports); */}
+                    {userReports.map((report) => (
+                      <div
+                        key={report._id}
+                        className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-medium text-gray-900">
+                            {report.typeOfReport || "Untitled"} Report
+                          </h4>
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              report.status === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : report.status === "approved"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {report.status}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {report.hearerName || "No description"}
+                        </p>
+                        <div className="text-xs text-gray-500">
+                          Fellowship: {report.fellowship || "N/A"} | Created:{" "}
+                          {new Date(report.createdAt).toLocaleDateString()}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Mobile: {report.mobileNumber || "N/A"}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="flex items-center px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <ChevronLeft size={16} className="mr-1" />
+                        Previous
+                      </button>
+                      <span className="text-sm text-gray-600">
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="flex items-center px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                        <ChevronRight size={16} className="ml-1" />
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>

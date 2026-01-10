@@ -56,7 +56,7 @@ export const getSubZone = TryCatch(async (req, res) => {
 });
 
 export const getAllSubZones = TryCatch(async (req, res) => {
-    const subZones = await Subzone.find().populate('zonalCoordinator evngCoordinator allMembers fellowships');
+    const subZones = await Subzone.find().populate('zonalCoordinator evngCoordinator allMembers fellowships zone region');
     res.json({
         message: "SubZones found",
         subZones,

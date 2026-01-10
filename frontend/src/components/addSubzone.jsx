@@ -95,7 +95,7 @@ const AddSubzone = () => {
     setEditingSubzone(subzone);
     setEditFormData({
       name: subzone.name,
-      region: subzone.zone?.region?._id || "",
+      region: subzone.region?._id || "",
       zone: subzone.zone?._id || "",
       zonalCoordinator: subzone.zonalCoordinator?.zionId || "",
       evngCoordinator: subzone.evngCoordinator?.zionId || "",

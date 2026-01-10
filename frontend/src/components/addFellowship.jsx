@@ -119,7 +119,7 @@ const AddFellowship = () => {
     setEditingFellowship(fellowship);
     setEditFormData({
       name: fellowship.name,
-      region: fellowship.zone?.region?._id || "",
+      region: fellowship.region?._id || "",
       zone: fellowship.zone?._id || "",
       subzone: fellowship.subzone?._id || "",
       coordinator: fellowship.coordinator?.zionId || "",

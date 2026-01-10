@@ -165,7 +165,7 @@ export const deleteFellowship = TryCatch(async (req, res) => {
 });
 
 export const getAllFellowships = TryCatch(async (req, res) => {
-    const fellowships = await Fellowship.find().populate('coordinator evngCoordinator zonalCoordinator');
+    const fellowships = await Fellowship.find().populate('coordinator evngCoordinator zonalCoordinator zone subzone region');
     res.json({
         message: "Fellowships found",
         fellowships,

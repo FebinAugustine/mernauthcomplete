@@ -8,7 +8,21 @@ import {
 } from "../api/admin.api";
 
 const ZonalDashboard = () => {
-  const [stats, setStats] = useState({});
+  const [stats, setStats] = useState({
+    totalRegions: 0,
+    totalZones: 0,
+    totalSubzones: 0,
+    totalFellowships: 0,
+    totalUsers: 0,
+    totalReports: 0,
+    positiveReports: 0,
+    negativeReports: 0,
+    neutralReports: 0,
+    totalCoordinators: 0,
+    totalEvngCoordinators: 0,
+    totalZonalCoordinators: 0,
+    totalRegionalCoordinators: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -134,7 +148,15 @@ const ZonalDashboard = () => {
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Zonal Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+        <div className="bg-red-500 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold">Total Regions</h2>
+          <p className="text-3xl">{stats.totalRegions || 0}</p>
+        </div>
+        <div className="bg-orange-500 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold">Total Zones</h2>
+          <p className="text-3xl">{stats.totalZones || 0}</p>
+        </div>
         <div className="bg-blue-500 text-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold">Total Subzones</h2>
           <p className="text-3xl">{stats.totalSubzones || 0}</p>
@@ -144,12 +166,12 @@ const ZonalDashboard = () => {
           <p className="text-3xl">{stats.totalFellowships || 0}</p>
         </div>
         <div className="bg-purple-500 text-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold">Total Reports</h2>
-          <p className="text-3xl">{stats.totalReports || 0}</p>
-        </div>
-        <div className="bg-orange-500 text-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold">Total Users</h2>
           <p className="text-3xl">{stats.totalUsers || 0}</p>
+        </div>
+        <div className="bg-yellow-500 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold">Total Reports</h2>
+          <p className="text-3xl">{stats.totalReports || 0}</p>
         </div>
       </div>
 
@@ -166,6 +188,26 @@ const ZonalDashboard = () => {
         <div className="bg-gray-600 text-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold">Neutral Reports</h2>
           <p className="text-3xl">{stats.neutralReports || 0}</p>
+        </div>
+      </div>
+
+      {/* Coordinator Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-indigo-500 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold">Regional Coordinators</h2>
+          <p className="text-3xl">{stats.totalRegionalCoordinators || 0}</p>
+        </div>
+        <div className="bg-teal-500 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold">Zonal Coordinators</h2>
+          <p className="text-3xl">{stats.totalZonalCoordinators || 0}</p>
+        </div>
+        <div className="bg-cyan-500 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold">Coordinators</h2>
+          <p className="text-3xl">{stats.totalCoordinators || 0}</p>
+        </div>
+        <div className="bg-pink-500 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold">Evangelism Coordinators</h2>
+          <p className="text-3xl">{stats.totalEvngCoordinators || 0}</p>
         </div>
       </div>
 

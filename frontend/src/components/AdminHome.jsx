@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 
 const AdminHome = ({ user }) => {
   const [stats, setStats] = useState({
+    totalRegions: 0,
+    totalZones: 0,
     totalSubzones: 0,
     totalFellowships: 0,
     totalUsers: 0,
@@ -11,6 +13,10 @@ const AdminHome = ({ user }) => {
     positiveReports: 0,
     negativeReports: 0,
     neutralReports: 0,
+    totalCoordinators: 0,
+    totalEvngCoordinators: 0,
+    totalZonalCoordinators: 0,
+    totalRegionalCoordinators: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +62,19 @@ const AdminHome = ({ user }) => {
 
       <div className="bg-white rounded-lg shadow p-6 mb-6 ml-2 mr-2 md:ml-6 md:mr-6">
         <h2 className="text-xl font-semibold mb-4">System Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+          <div className="bg-red-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-red-900">Total Regions</h3>
+            <p className="text-red-600 text-2xl font-bold">
+              {stats.totalRegions}
+            </p>
+          </div>
+          <div className="bg-orange-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-orange-900">Total Zones</h3>
+            <p className="text-orange-600 text-2xl font-bold">
+              {stats.totalZones}
+            </p>
+          </div>
           <div className="bg-blue-50 p-4 rounded-lg">
             <h3 className="text-lg font-medium text-blue-900">
               Total Subzones
@@ -119,6 +137,42 @@ const AdminHome = ({ user }) => {
                 {stats.neutralReports}
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6 ml-2 mr-2 md:ml-6 md:mr-6">
+        <h2 className="text-xl font-semibold mb-4">Coordinator Summary</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-indigo-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-indigo-900">
+              Regional Coordinators
+            </h3>
+            <p className="text-indigo-600 text-2xl font-bold">
+              {stats.totalRegionalCoordinators}
+            </p>
+          </div>
+          <div className="bg-teal-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-teal-900">
+              Zonal Coordinators
+            </h3>
+            <p className="text-teal-600 text-2xl font-bold">
+              {stats.totalZonalCoordinators}
+            </p>
+          </div>
+          <div className="bg-cyan-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-cyan-900">Coordinators</h3>
+            <p className="text-cyan-600 text-2xl font-bold">
+              {stats.totalCoordinators}
+            </p>
+          </div>
+          <div className="bg-pink-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-pink-900">
+              Evangelism Coordinators
+            </h3>
+            <p className="text-pink-600 text-2xl font-bold">
+              {stats.totalEvngCoordinators}
+            </p>
           </div>
         </div>
       </div>

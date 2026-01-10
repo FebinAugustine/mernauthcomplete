@@ -8,6 +8,8 @@ import { Region } from "../models/region.model.js";
 import { Report } from "../models/Report.model.js";
 
 export const getDashboardStats = TryCatch(async (req, res) => {
+    const totalRegions = await Region.countDocuments();
+    const totalZones = await Zone.countDocuments();
     const totalSubzones = await Subzone.countDocuments();
     const totalFellowships = await Fellowship.countDocuments();
     const totalUsers = await User.countDocuments();
@@ -16,7 +18,15 @@ export const getDashboardStats = TryCatch(async (req, res) => {
     const negativeReports = await Report.countDocuments({ status: 'Negative' });
     const neutralReports = await Report.countDocuments({ status: 'Neutral' });
 
+    // Count coordinators by role
+    const totalCoordinators = await User.countDocuments({ role: 'cordinator' });
+    const totalEvngCoordinators = await User.countDocuments({ role: 'evngcordinator' });
+    const totalZonalCoordinators = await User.countDocuments({ role: 'zonal' });
+    const totalRegionalCoordinators = await User.countDocuments({ role: 'regional' });
+
     res.json({
+        totalRegions,
+        totalZones,
         totalSubzones,
         totalFellowships,
         totalUsers,
@@ -24,6 +34,10 @@ export const getDashboardStats = TryCatch(async (req, res) => {
         positiveReports,
         negativeReports,
         neutralReports,
+        totalCoordinators,
+        totalEvngCoordinators,
+        totalZonalCoordinators,
+        totalRegionalCoordinators,
     });
 });
 

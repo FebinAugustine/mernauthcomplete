@@ -14,6 +14,8 @@ import AddReport from "../components/addReport";
 import AddSubzone from "../components/addSubzone";
 import AddFellowship from "../components/addFellowship";
 import AddUser from "../components/addUser";
+import AddRegion from "../components/addRegion";
+import AddZone from "../components/addZone";
 import ZonalDashboard from "../components/zonalDashboard";
 
 const AdminDashboard = () => {
@@ -76,7 +78,9 @@ const AdminDashboard = () => {
     { id: "profile", label: "Profile", icon: "👤" },
 
     { id: "", label: "ADMIN TOOLS", icon: "" },
-    { id: "zonal-dashboard", label: "Zonal Dashboard", icon: "📊" },
+    { id: "admin-dashboard", label: "Admin Dashboard", icon: "📊" },
+    { id: "add-region", label: "Add Region", icon: "🌍" },
+    { id: "add-zone", label: "Add Zone", icon: "🏞️" },
     { id: "add-subzone", label: "Add Subzone", icon: "🏘️" },
     { id: "add-fellowship", label: "Add Fellowship", icon: " 👥" },
     { id: "add-user", label: "Add User", icon: "👤" },
@@ -112,8 +116,12 @@ const AdminDashboard = () => {
         );
       case "add-report":
         return <AddReport user={user} setActiveTab={setActiveTab} />;
-      case "zonal-dashboard":
+      case "admin-dashboard":
         return <ZonalDashboard />;
+      case "add-region":
+        return <AddRegion />;
+      case "add-zone":
+        return <AddZone />;
       case "add-subzone":
         return <AddSubzone />;
       case "add-fellowship":

@@ -4,6 +4,10 @@ import {
   getUsersPaginated,
   updateUser,
   deleteUser,
+  getAllFellowships,
+  getAllSubzones,
+  getAllZones,
+  getAllRegions,
 } from "../api/admin.api";
 import { getReportsByUserId } from "../api/report.api";
 import { toast } from "react-toastify";
@@ -28,10 +32,16 @@ const AddUser = () => {
     dob: "",
     zionId: "",
     subZone: "",
+    zone: "",
+    region: "",
   });
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
+  const [fellowships, setFellowships] = useState([]);
+  const [subzones, setSubzones] = useState([]);
+  const [zones, setZones] = useState([]);
+  const [regions, setRegions] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: "",
@@ -44,6 +54,8 @@ const AddUser = () => {
     dob: "",
     zionId: "",
     subZone: "",
+    zone: "",
+    region: "",
   });
   const [editLoading, setEditLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -85,6 +97,8 @@ const AddUser = () => {
         dob: "",
         zionId: "",
         subZone: "",
+        zone: "",
+        region: "",
       });
       // Update cache with new user
       if (result.user) {
@@ -98,6 +112,28 @@ const AddUser = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [fellowshipsData, subzonesData, zonesData, regionsData] =
+          await Promise.all([
+            getAllFellowships(),
+            getAllSubzones(),
+            getAllZones(),
+            getAllRegions(),
+          ]);
+        setFellowships(fellowshipsData.fellowships || []);
+        setSubzones(subzonesData.subZones || []);
+        setZones(zonesData.zones || []);
+        setRegions(regionsData.regions || []);
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+        toast.error("Failed to load data");
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     fetchUsers(userCurrentPage, search);
@@ -130,13 +166,15 @@ const AddUser = () => {
       name: user.name,
       email: user.email,
       role: user.role,
-      fellowship: user.fellowship?.name || "",
+      fellowship: user.fellowship?._id || "",
       phone: user.phone,
       address: user.address || "",
       gender: user.gender || "",
       dob: user.dob ? new Date(user.dob).toISOString().split("T")[0] : "",
       zionId: user.zionId,
-      subZone: user.subZone?.name || "",
+      subZone: user.subZone?._id || "",
+      zone: user.zone?._id || "",
+      region: user.region?._id || "",
     });
   };
 
@@ -304,16 +342,22 @@ const AddUser = () => {
             {/* Fellowship */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Fellowship Name *
+                Fellowship *
               </label>
-              <input
-                type="text"
+              <select
                 name="fellowship"
                 value={formData.fellowship}
                 onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                 required
-              />
+              >
+                <option value="">Select Fellowship</option>
+                {fellowships.map((fellowship) => (
+                  <option key={fellowship._id} value={fellowship._id}>
+                    {fellowship.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Phone */}
@@ -395,15 +439,61 @@ const AddUser = () => {
             {/* SubZone */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                SubZone Name
+                SubZone
               </label>
-              <input
-                type="text"
+              <select
                 name="subZone"
                 value={formData.subZone}
                 onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-              />
+              >
+                <option value="">Select SubZone</option>
+                {subzones.map((subzone) => (
+                  <option key={subzone._id} value={subzone._id}>
+                    {subzone.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Zone */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Zone
+              </label>
+              <select
+                name="zone"
+                value={formData.zone}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              >
+                <option value="">Select Zone</option>
+                {zones.map((zone) => (
+                  <option key={zone._id} value={zone._id}>
+                    {zone.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Region */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Region
+              </label>
+              <select
+                name="region"
+                value={formData.region}
+                onChange={handleChange}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              >
+                <option value="">Select Region</option>
+                {regions.map((region) => (
+                  <option key={region._id} value={region._id}>
+                    {region.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -521,6 +611,14 @@ const AddUser = () => {
                   <div className="flex items-center text-sm text-gray-600">
                     <span className="font-medium w-20">SubZone:</span>
                     <span>{user.subZone?.name || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-20">Zone:</span>
+                    <span>{user.zone?.name || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium w-20">Region:</span>
+                    <span>{user.region?.name || "N/A"}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <span className="font-medium w-20">Zion ID:</span>
@@ -641,15 +739,21 @@ const AddUser = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Fellowship Name
+                      Fellowship
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="fellowship"
                       value={editFormData.fellowship}
                       onChange={handleEditChange}
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    />
+                    >
+                      <option value="">Select Fellowship</option>
+                      {fellowships.map((fellowship) => (
+                        <option key={fellowship._id} value={fellowship._id}>
+                          {fellowship.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
@@ -724,15 +828,59 @@ const AddUser = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      SubZone Name
+                      SubZone
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="subZone"
                       value={editFormData.subZone}
                       onChange={handleEditChange}
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    />
+                    >
+                      <option value="">Select SubZone</option>
+                      {subzones.map((subzone) => (
+                        <option key={subzone._id} value={subzone._id}>
+                          {subzone.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Zone
+                    </label>
+                    <select
+                      name="zone"
+                      value={editFormData.zone}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="">Select Zone</option>
+                      {zones.map((zone) => (
+                        <option key={zone._id} value={zone._id}>
+                          {zone.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Region
+                    </label>
+                    <select
+                      name="region"
+                      value={editFormData.region}
+                      onChange={handleEditChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    >
+                      <option value="">Select Region</option>
+                      {regions.map((region) => (
+                        <option key={region._id} value={region._id}>
+                          {region.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

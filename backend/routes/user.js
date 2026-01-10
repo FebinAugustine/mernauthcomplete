@@ -16,7 +16,7 @@ import {
   changePassword,
   createNewUser,
 } from "../controllers/user.js";
-import { authorizedAdmin, isAuth } from "../middlewares/isAuth.js";
+import { authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, isAuth } from "../middlewares/isAuth.js";
 import { verifyCSRFToken } from "../config/csrfMiddleware.js";
 
 const router = express.Router();
@@ -30,14 +30,14 @@ router.put("/update", isAuth, updateUser);
 router.post("/refresh", refreshToken);
 router.post("/logout", isAuth, verifyCSRFToken, logoutUser);
 router.post("/refresh-csrf", isAuth, refreshCSRF);
-router.get("/admin", isAuth, authorizedAdmin, adminController);
+router.get("/admin", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, adminController);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 router.post("/change-password", isAuth, changePassword);
-router.post("/get-all-users", isAuth, authorizedAdmin, getAllUsers);
+router.post("/get-all-users", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, getAllUsers);
 
 // admin routes can be added here
-router.use("/createnew-user", isAuth, authorizedAdmin, createNewUser);
+router.use("/createnew-user", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, createNewUser);
 
 
 export default router;

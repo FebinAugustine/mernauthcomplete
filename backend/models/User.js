@@ -18,7 +18,7 @@ const schema = new mongoose.Schema(
     role: {
       type: String,
       default: "user",
-      enum: [ "user", "zonal", "admin", "evngcordinator", "cordinator" ],
+      enum: [ "user", "zonal", "admin", "evngcordinator", "cordinator", "regional" ],
     },
     isBlocked: {
       type: Boolean,
@@ -66,9 +66,12 @@ const schema = new mongoose.Schema(
       ref: "Subzone",
     },
     zone: {
-      type: String,
-      enum: [ "Kochi", "Ernakulam", "Varappuzha", "Pala", "Zion" ],
-      default: "Kochi",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Zone",
+    },
+    region: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Region",
     },
     reports: [ {
       type: mongoose.Schema.Types.ObjectId,

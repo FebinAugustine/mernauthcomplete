@@ -1,11 +1,22 @@
 
 import { Subzone } from '../models/subZone.model.js';
 import { User } from '../models/User.js';
+import { Region } from '../models/region.model.js';
 import TryCatch from '../middlewares/TryCatch.js';
 import sanitize from 'mongo-sanitize';
 
 export const createSubZone = TryCatch(async (req, res) => {
     const sanitizedBody = sanitize(req.body);
+
+    // Find region by id
+    if (sanitizedBody.region) {
+        const region = await Region.findById(sanitizedBody.region);
+        if (!region) {
+            return res.status(400).json({
+                message: "Region not found",
+            });
+        }
+    }
 
     // find the zonalCoordinator and evngCoordinator by zionId
     const zonalCoordinator = await User.findOne({ zionId: sanitizedBody.zonalCoordinator });
@@ -55,6 +66,16 @@ export const getAllSubZones = TryCatch(async (req, res) => {
 export const updateSubZone = TryCatch(async (req, res) => {
     const { id } = req.params;
     const sanitizedBody = sanitize(req.body);
+
+    // If region is provided, find by id
+    if (sanitizedBody.region) {
+        const region = await Region.findById(sanitizedBody.region);
+        if (!region) {
+            return res.status(400).json({
+                message: "Region not found",
+            });
+        }
+    }
 
     // If zonalCoordinator is provided, find by zionId and replace with _id
     if (sanitizedBody.zonalCoordinator) {

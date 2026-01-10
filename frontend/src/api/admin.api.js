@@ -2,6 +2,110 @@
 
 import api from "../apiIntercepter";
 
+// Region API Calls
+
+// Create Region
+export const createRegion = async (regionData) => {
+    try {
+        const res = await api.post("/admin/create-region", regionData);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get Region by ID
+export const getRegion = async (id) => {
+    try {
+        const res = await api.get(`/admin/get-region/${id}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get All Regions
+export const getAllRegions = async () => {
+    try {
+        const res = await api.get("/admin/get-all-regions");
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Update Region
+export const updateRegion = async (id, regionData) => {
+    try {
+        const res = await api.put(`/admin/update-region/${id}`, regionData);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Delete Region
+export const deleteRegion = async (id) => {
+    try {
+        const res = await api.delete(`/admin/delete-region/${id}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Zone API Calls
+
+// Create Zone
+export const createZone = async (zoneData) => {
+    try {
+        const res = await api.post("/admin/create-zone", zoneData);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get Zone by ID
+export const getZone = async (id) => {
+    try {
+        const res = await api.get(`/admin/get-zone/${id}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Get All Zones
+export const getAllZones = async () => {
+    try {
+        const res = await api.get("/admin/get-all-zones");
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Update Zone
+export const updateZone = async (id, zoneData) => {
+    try {
+        const res = await api.put(`/admin/update-zone/${id}`, zoneData);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
+// Delete Zone
+export const deleteZone = async (id) => {
+    try {
+        const res = await api.delete(`/admin/delete-zone/${id}`);
+        return res.data;
+    } catch (error) {
+        throw error.response || error;
+    }
+};
+
 
 
 export const getAllUsers = async () => {

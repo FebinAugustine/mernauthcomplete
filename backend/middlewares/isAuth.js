@@ -64,10 +64,11 @@ export const isAuth = async (req, res, next) => {
   }
 };
 
-export const authorizedAdmin = async (req, res, next) => {
+// only for admin
+export const authAdmin = async (req, res, next) => {
   const user = req.user;
 
-  if (user.role !== "admin" && user.role !== "super-admin" && user.role !== "zonal" && user.role !== "cordinator" && user.role !== "evngcordinator") {
+  if (user.role !== "admin") {
     return res.status(401).json({
       message: "You are not allowed for this activity",
     });
@@ -75,3 +76,56 @@ export const authorizedAdmin = async (req, res, next) => {
 
   next();
 };
+
+// Only for admin and regional
+export const authorizedAdminOrRegional = async (req, res, next) => {
+  const user = req.user;
+
+  if (user.role !== "admin" && user.role !== "regional") {
+    return res.status(401).json({
+      message: "You are not allowed for this activity",
+    });
+  }
+
+  next();
+};
+
+// Only for admin, regional and zonal 
+export const authorizedAdminOrRegionalOrZonal = async (req, res, next) => {
+  const user = req.user;
+
+  if (user.role !== "admin" && user.role !== "regional" && user.role !== "zonal") {
+    return res.status(401).json({
+      message: "You are not allowed for this activity",
+    });
+  }
+
+  next();
+};
+
+// Only for admin, regional, zonal and coordinator 
+export const authorizedAdminOrRegionalOrZonalOrCoordinator = async (req, res, next) => {
+  const user = req.user;
+
+  if (user.role !== "admin" && user.role !== "regional" && user.role !== "zonal" && user.role !== "cordinator") {
+    return res.status(401).json({
+      message: "You are not allowed for this activity",
+    });
+  }
+
+  next();
+};
+
+// Only for admin, regional, zonal, coordinator, evngCoordinator
+export const authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator = async (req, res, next) => {
+  const user = req.user;
+
+  if (user.role !== "admin" && user.role !== "regional" && user.role !== "zonal" && user.role !== "cordinator" && user.role !== "evngcordinator") {
+    return res.status(401).json({
+      message: "You are not allowed for this activity",
+    });
+  }
+
+  next();
+};
+

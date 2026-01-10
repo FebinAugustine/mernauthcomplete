@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { de } from "zod/v4/locales";
 
 const schema = new mongoose.Schema(
     {
@@ -9,53 +10,44 @@ const schema = new mongoose.Schema(
             minlength: 4,
             maxlength: 50,
         },
-        region: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Region",
-            required: true,
-        },
-        zone: {
+        zones: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Zone",
-            required: true,
         },
-        subzone: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Subzone",
-            required: true,
-        },
-        coordinator: {
+        regionalCoordinator: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
-
         },
-        evngCoordinator: {
+        zonalCoordinators: [ {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-
-        },
-        zonalCoordinator: {
+            required: true,
+        } ],
+        evngCoordinators: [ {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-
-        },
+            required: true,
+        } ],
         totalMembers: {
             type: Number,
-            required: true,
             default: 0,
             min: 0,
-        },
-        address: {
-            type: String,
-            default: "",
         },
         allMembers: [ {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         } ],
+        subZones: [ {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Subzone",
+        } ],
+        fellowships: [ {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Fellowship",
+        } ],
     },
     { timestamps: true }
 );
 
-export const Fellowship = mongoose.model("Fellowship", schema);
+export const Region = mongoose.model("Region", schema);

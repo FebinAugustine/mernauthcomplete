@@ -3,6 +3,8 @@ import sanitize from "mongo-sanitize";
 import { User } from "../models/User.js";
 import { Fellowship } from "../models/Fellowship.model.js";
 import { Subzone } from "../models/subZone.model.js";
+import { Zone } from "../models/zone.model.js";
+import { Region } from "../models/region.model.js";
 import { Report } from "../models/Report.model.js";
 
 export const getDashboardStats = TryCatch(async (req, res) => {
@@ -99,6 +101,8 @@ export const getUsersPaginated = TryCatch(async (req, res) => {
     const users = await User.find(query)
         .populate('fellowship', 'name')
         .populate('subZone', 'name')
+        .populate('zone', 'name')
+        .populate('region', 'name')
         .sort({ name: 1 })
         .skip((page - 1) * limit)
         .limit(limit);
@@ -114,11 +118,11 @@ export const getUsersPaginated = TryCatch(async (req, res) => {
 export const updateUserAdmin = TryCatch(async (req, res) => {
     const userId = req.params.id;
     const sanitizedBody = sanitize(req.body);
-    const { fellowship, subZone, ...updateData } = sanitizedBody;
+    const { fellowship, subZone, zone, region, ...updateData } = sanitizedBody;
 
-    // Find fellowship by name if provided
+    // Find fellowship by id if provided
     if (fellowship) {
-        const fellowshipDoc = await Fellowship.findOne({ name: fellowship });
+        const fellowshipDoc = await Fellowship.findById(fellowship);
         if (!fellowshipDoc) {
             return res.status(400).json({
                 message: "Fellowship not found",
@@ -127,9 +131,9 @@ export const updateUserAdmin = TryCatch(async (req, res) => {
         updateData.fellowship = fellowshipDoc._id;
     }
 
-    // Find subZone by name if provided
+    // Find subZone by id if provided
     if (subZone) {
-        const subZoneDoc = await Subzone.findOne({ name: subZone });
+        const subZoneDoc = await Subzone.findById(subZone);
         if (!subZoneDoc) {
             return res.status(400).json({
                 message: "SubZone not found",
@@ -138,10 +142,32 @@ export const updateUserAdmin = TryCatch(async (req, res) => {
         updateData.subZone = subZoneDoc._id;
     }
 
+    // Find zone by id if provided
+    if (zone) {
+        const zoneDoc = await Zone.findById(zone);
+        if (!zoneDoc) {
+            return res.status(400).json({
+                message: "Zone not found",
+            });
+        }
+        updateData.zone = zoneDoc._id;
+    }
+
+    // Find region by id if provided
+    if (region) {
+        const regionDoc = await Region.findById(region);
+        if (!regionDoc) {
+            return res.status(400).json({
+                message: "Region not found",
+            });
+        }
+        updateData.region = regionDoc._id;
+    }
+
     const user = await User.findByIdAndUpdate(userId, updateData, {
         new: true,
         runValidators: true,
-    }).populate('fellowship', 'name').populate('subZone', 'name');
+    }).populate('fellowship', 'name').populate('subZone', 'name').populate('zone', 'name').populate('region', 'name');
 
     if (!user) {
         return res.status(404).json({

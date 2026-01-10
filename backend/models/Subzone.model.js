@@ -10,11 +10,15 @@ const schema = new mongoose.Schema(
             minlength: 4,
             maxlength: 50,
         },
-        zone: {
-            type: String,
+        region: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Region",
             required: true,
-            enum: [ "Kochi", "Ernakulam", "Varappuzha", "Pala", "Zion" ],
-            default: "Kochi",
+        },
+        zone: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Zone",
+            required: true,
         },
         zonalCoordinator: {
             type: mongoose.Schema.Types.ObjectId,

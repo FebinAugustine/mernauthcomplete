@@ -8,10 +8,9 @@ const schema = new mongoose.Schema(
             required: true,
         },
         fellowship: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Fellowship",
             required: true,
-            enum: [ "Thevara", "FortKochi", "Palarivattom", "Varappuzha", "Pala", "Zion" ],
-            default: "Thevara",
         },
         typeOfReport: {
             type: String,

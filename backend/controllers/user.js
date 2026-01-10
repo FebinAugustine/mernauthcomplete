@@ -5,6 +5,8 @@ import sanitize from "mongo-sanitize";
 import { User } from "../models/User.js";
 import { Fellowship } from "../models/Fellowship.model.js";
 import { Subzone } from "../models/subZone.model.js";
+import { Zone } from "../models/zone.model.js";
+import { Region } from "../models/region.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import sendMail from "../config/sendMail.js";
@@ -67,8 +69,8 @@ export const registerUser = TryCatch(async (req, res) => {
 
   const verifyKey = `verify:${verifyToken}`;
 
-  // Find the fellowship objectID from Fellowship name and store that ID
-  const fellowshipObject = await Fellowship.findOne({ name: fellowship });
+  // Find the fellowship objectID from Fellowship id and store that ID
+  const fellowshipObject = await Fellowship.findById(fellowship);
   if (!fellowshipObject) {
     return res.status(400).json({
       message: "Fellowship not found",
@@ -297,8 +299,8 @@ export const myProfile = TryCatch(async (req, res) => {
     };
   }
 
-  // Populate fellowship and subZone
-  const user = await User.findById(userId).select("-password").populate('fellowship', 'name').populate('subZone', 'name');
+  // Populate fellowship, subZone, zone, region
+  const user = await User.findById(userId).select("-password").populate('fellowship', 'name').populate('subZone', 'name').populate('zone', 'name').populate('region', 'name');
 
   res.json({ user, sessionInfo });
 });
@@ -368,9 +370,9 @@ export const updateUser = TryCatch(async (req, res) => {
   const userId = req.user._id;
   const sanitezedBody = sanitize(req.body);
 
-  // Handle fellowship conversion if provided as string
-  if (sanitezedBody.fellowship && typeof sanitezedBody.fellowship === 'string') {
-    const fellowshipObject = await Fellowship.findOne({ name: sanitezedBody.fellowship });
+  // Handle fellowship conversion if provided
+  if (sanitezedBody.fellowship) {
+    const fellowshipObject = await Fellowship.findById(sanitezedBody.fellowship);
     if (!fellowshipObject) {
       return res.status(400).json({
         message: "Fellowship not found",
@@ -379,15 +381,37 @@ export const updateUser = TryCatch(async (req, res) => {
     sanitezedBody.fellowship = fellowshipObject._id;
   }
 
-  // Handle subZone conversion if provided as string
-  if (sanitezedBody.subZone && typeof sanitezedBody.subZone === 'string') {
-    const subZoneObject = await Subzone.findOne({ name: sanitezedBody.subZone });
+  // Handle subZone conversion if provided
+  if (sanitezedBody.subZone) {
+    const subZoneObject = await Subzone.findById(sanitezedBody.subZone);
     if (!subZoneObject) {
       return res.status(400).json({
         message: "SubZone not found",
       });
     }
     sanitezedBody.subZone = subZoneObject._id;
+  }
+
+  // Handle zone conversion if provided
+  if (sanitezedBody.zone) {
+    const zoneObject = await Zone.findById(sanitezedBody.zone);
+    if (!zoneObject) {
+      return res.status(400).json({
+        message: "Zone not found",
+      });
+    }
+    sanitezedBody.zone = zoneObject._id;
+  }
+
+  // Handle region conversion if provided
+  if (sanitezedBody.region) {
+    const regionObject = await Region.findById(sanitezedBody.region);
+    if (!regionObject) {
+      return res.status(400).json({
+        message: "Region not found",
+      });
+    }
+    sanitezedBody.region = regionObject._id;
   }
 
   const user = await User.findByIdAndUpdate(userId, sanitezedBody, {
@@ -418,7 +442,7 @@ export const deleteUser = TryCatch(async (req, res) => {
 });
 
 export const getAllUsers = TryCatch(async (req, res) => {
-  const users = await User.find().populate('fellowship', 'name').populate('subZone', 'name');
+  const users = await User.find().populate('fellowship', 'name').populate('subZone', 'name').populate('zone', 'name').populate('region', 'name');
   res.json({
     message: "Users found",
     users,
@@ -585,23 +609,23 @@ export const changePassword = TryCatch(async (req, res) => {
 // Create a new User
 export const createNewUser = TryCatch(async (req, res) => {
   const sanitizedBody = sanitize(req.body);
-  const { name, email, password, role, fellowship, phone, address, gender, dob, zionId, subZone } = sanitizedBody;
+  const { name, email, password, role, fellowship, phone, address, gender, dob, zionId, subZone, zone, region } = sanitizedBody;
 
   // Hash the password
   const hashPassword = await bcrypt.hash(password, 10);
 
-  // Find fellowship by name
-  const fellowshipDoc = await Fellowship.findOne({ name: fellowship });
+  // Find fellowship by id
+  const fellowshipDoc = await Fellowship.findById(fellowship);
   if (!fellowshipDoc) {
     return res.status(400).json({
       message: "Fellowship not found",
     });
   }
 
-  // Find subZone by name if provided
+  // Find subZone by id if provided
   let subZoneDoc = null;
   if (subZone) {
-    subZoneDoc = await Subzone.findOne({ name: subZone });
+    subZoneDoc = await Subzone.findById(subZone);
     if (!subZoneDoc) {
       return res.status(400).json({
         message: "SubZone not found",
@@ -609,25 +633,59 @@ export const createNewUser = TryCatch(async (req, res) => {
     }
   }
 
-  // Create the new user
-  const newUser = await User.create({
-    name,
-    email,
-    password: hashPassword,
-    role: role || "user",
-    fellowship: fellowshipDoc._id,
-    phone,
-    address,
-    gender,
-    dob,
-    zionId,
-    subZone: subZoneDoc ? subZoneDoc._id : undefined,
-    isVerified: true,
-  });
+  // Find zone by id if provided
+  let zoneDoc = null;
+  if (zone) {
+    zoneDoc = await Zone.findById(zone);
+    if (!zoneDoc) {
+      return res.status(400).json({
+        message: "Zone not found",
+      });
+    }
+  }
 
-  res.status(201).json({
-    message: "User created successfully",
-    user: newUser,
-  });
+  // Find region by id if provided
+  let regionDoc = null;
+  if (region) {
+    regionDoc = await Region.findById(region);
+    if (!regionDoc) {
+      return res.status(400).json({
+        message: "Region not found",
+      });
+    }
+  }
+
+  // Create the new user
+  try {
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashPassword,
+      role: role || "user",
+      fellowship: fellowshipDoc._id,
+      phone,
+      address,
+      gender,
+      dob,
+      zionId,
+      subZone: subZoneDoc ? subZoneDoc._id : undefined,
+      zone: zoneDoc ? zoneDoc._id : undefined,
+      region: regionDoc ? regionDoc._id : undefined,
+      isVerified: true,
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: newUser,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      // Duplicate key error
+      return res.status(400).json({
+        message: "Zion ID already exists. Please use a different Zion ID.",
+      });
+    }
+    throw error; // Re-throw other errors
+  }
 });
 

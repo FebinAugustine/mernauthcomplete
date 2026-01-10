@@ -4,11 +4,22 @@
 
 import { Fellowship } from "../models/Fellowship.model.js";
 import { User } from "../models/User.js";
+import { Region } from "../models/region.model.js";
 import TryCatch from "../middlewares/TryCatch.js";
 import sanitize from "mongo-sanitize";
 
 export const createFellowship = TryCatch(async (req, res) => {
     const sanitizedBody = sanitize(req.body);
+
+    // Find region by id
+    if (sanitizedBody.region) {
+        const region = await Region.findById(sanitizedBody.region);
+        if (!region) {
+            return res.status(400).json({
+                message: "Region not found",
+            });
+        }
+    }
 
     // Find coordinator by zionId
     const coordinatorUser = await User.findOne({ zionId: sanitizedBody.coordinator });
@@ -71,6 +82,16 @@ export const getFellowship = TryCatch(async (req, res) => {
 export const updateFellowship = TryCatch(async (req, res) => {
     const { id } = req.params;
     const sanitizedBody = sanitize(req.body);
+
+    // Find region by id if provided
+    if (sanitizedBody.region) {
+        const region = await Region.findById(sanitizedBody.region);
+        if (!region) {
+            return res.status(400).json({
+                message: "Region not found",
+            });
+        }
+    }
 
     // Find coordinator by zionId if provided
     if (sanitizedBody.coordinator) {

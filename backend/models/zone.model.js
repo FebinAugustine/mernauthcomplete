@@ -12,50 +12,41 @@ const schema = new mongoose.Schema(
         region: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Region",
-            required: true,
+            // required: true,
         },
-        zone: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Zone",
-            required: true,
-        },
-        subzone: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Subzone",
-            required: true,
-        },
-        coordinator: {
+        regionalCoordinator: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
-
-        },
-        evngCoordinator: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-
+            // required: true,
         },
         zonalCoordinator: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-
+            // required: true,
         },
+        evngCoordinators: [ {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        } ],
         totalMembers: {
             type: Number,
-            required: true,
             default: 0,
             min: 0,
-        },
-        address: {
-            type: String,
-            default: "",
         },
         allMembers: [ {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         } ],
+        subZones: [ {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Subzone",
+        } ],
+        fellowships: [ {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Fellowship",
+        } ],
     },
     { timestamps: true }
 );
 
-export const Fellowship = mongoose.model("Fellowship", schema);
+export const Zone = mongoose.model("Zone", schema);

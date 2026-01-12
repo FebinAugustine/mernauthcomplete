@@ -66,11 +66,11 @@ router.put("/update-subzone/:id", isAuth, authorizedAdminOrRegionalOrZonal, upda
 router.delete("/delete-subzone/:id", isAuth, authorizedAdminOrRegionalOrZonal, deleteSubZone);
 
 // Fellowship routes can be added here similarly
-router.post("/create-fellowship", isAuth, authorizedAdminOrRegionalOrZonal, createFellowship);
-router.get("/get-fellowship/:id", isAuth, authorizedAdminOrRegionalOrZonal, getFellowship);
-router.put("/update-fellowship/:id", isAuth, authorizedAdminOrRegionalOrZonal, updateFellowship);
-router.delete("/delete-fellowship/:id", isAuth, authorizedAdminOrRegionalOrZonal, deleteFellowship);
-router.get("/get-all-fellowships", isAuth, authorizedAdminOrRegionalOrZonal, getAllFellowships);
+router.post("/create-fellowship", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, createFellowship);
+router.get("/get-fellowship/:id", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, getFellowship);
+router.put("/update-fellowship/:id", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, updateFellowship);
+router.delete("/delete-fellowship/:id", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, deleteFellowship);
+router.get("/get-all-fellowships", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinatorOrEvngCoordinator, getAllFellowships);
 
 // User routes can be added here similarly
 router.post("/create-new-user", isAuth, authorizedAdminOrRegionalOrZonalOrCoordinator, createNewUser);

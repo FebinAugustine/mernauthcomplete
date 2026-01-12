@@ -5,6 +5,7 @@ import AdminDashboard from "./AdminDashboard";
 import RegionalDashboard from "./RegionalDashboard";
 import ZonalDashboard from "./ZonalDashboard";
 import CordinatorDashboard from "./CordinatorDashboard";
+import EvngCordinatorDashboard from "./EvngCordinatorDashboard";
 
 const MainRouter = () => {
   const { user } = AppData();
@@ -21,7 +22,11 @@ const MainRouter = () => {
     return <CordinatorDashboard />;
   }
 
-  const adminRoles = ["admin", "evngcordinator"];
+  if (user.role === "evngcordinator") {
+    return <EvngCordinatorDashboard />;
+  }
+
+  const adminRoles = ["admin"];
 
   if (adminRoles.includes(user.role)) {
     return <AdminDashboard />;

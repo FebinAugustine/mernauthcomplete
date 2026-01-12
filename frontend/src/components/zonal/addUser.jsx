@@ -354,8 +354,6 @@ const AddUser = () => {
                 required
               >
                 <option value="user">User</option>
-                <option value="zonal">Zonal</option>
-                <option value="admin">Admin</option>
                 <option value="evngcordinator">Evangelism Coordinator</option>
                 <option value="cordinator">Coordinator</option>
               </select>
@@ -740,8 +738,6 @@ const AddUser = () => {
                       required
                     >
                       <option value="user">User</option>
-                      <option value="zonal">Zonal</option>
-                      <option value="admin">Admin</option>
                       <option value="evngcordinator">
                         Evangelism Coordinator
                       </option>

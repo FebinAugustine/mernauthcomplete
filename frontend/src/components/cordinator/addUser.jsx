@@ -294,25 +294,17 @@ const AddUser = () => {
                 required
               />
             </div>
-
-            {/* Role */}
+            {/* Role - Fixed */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Role *
+                Role
               </label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                required
-              >
-                <option value="user">User</option>
-                <option value="zonal">Zonal</option>
-                <option value="admin">Admin</option>
-                <option value="evngcordinator">Evangelism Coordinator</option>
-                <option value="cordinator">Coordinator</option>
-              </select>
+              <input
+                type="text"
+                value="User"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100"
+                readOnly
+              />
             </div>
 
             {/* Region - Fixed */}
@@ -665,23 +657,14 @@ const AddUser = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Role *
+                      Role
                     </label>
-                    <select
-                      name="role"
-                      value={editFormData.role}
-                      onChange={handleEditChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                      required
-                    >
-                      <option value="user">User</option>
-                      <option value="zonal">Zonal</option>
-                      <option value="admin">Admin</option>
-                      <option value="evngcordinator">
-                        Evangelism Coordinator
-                      </option>
-                      <option value="cordinator">Coordinator</option>
-                    </select>
+                    <input
+                      type="text"
+                      value="User"
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100"
+                      readOnly
+                    />
                   </div>
 
                   <div>

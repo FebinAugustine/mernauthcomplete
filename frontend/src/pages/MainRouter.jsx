@@ -3,6 +3,7 @@ import { AppData } from "../context/AppContext";
 import Home from "./Home";
 import AdminDashboard from "./AdminDashboard";
 import RegionalDashboard from "./RegionalDashboard";
+import ZonalDashboard from "./ZonalDashboard";
 
 const MainRouter = () => {
   const { user } = AppData();
@@ -11,7 +12,11 @@ const MainRouter = () => {
     return null; // or loading
   }
 
-  const adminRoles = ["zonal", "admin", "evngcordinator", "cordinator"];
+  if (user.role === "zonal") {
+    return <ZonalDashboard />;
+  }
+
+  const adminRoles = ["admin", "evngcordinator", "cordinator"];
 
   if (adminRoles.includes(user.role)) {
     return <AdminDashboard />;
